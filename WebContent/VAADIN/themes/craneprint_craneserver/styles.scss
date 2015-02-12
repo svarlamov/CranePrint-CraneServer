@@ -1,0 +1,9 @@
+@import "addons.scss";
+@import "craneprint_craneserver.scss";
+
+/* This file prefixes all rules with the theme name to avoid causing conflicts with other themes. */
+/* The actual styles should be defined in craneprint_craneserver.scss */
+.craneprint_craneserver {
+  @include addons;
+  @include craneprint_craneserver;
+}

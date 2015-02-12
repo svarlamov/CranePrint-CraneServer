@@ -1,0 +1,5 @@
+{
+	"printers": [
+		{ "name":"Virtual Printer", "ip":"172.16.42.13", "port":"8181", "password":"password" }
+     ]
+}
