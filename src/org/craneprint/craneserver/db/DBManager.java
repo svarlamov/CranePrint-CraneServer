@@ -4,7 +4,7 @@ import java.io.File;
 import java.net.UnknownHostException;
 import java.util.Date;
 
-import org.craneprint.craneserver.GCodeFile;
+import org.craneprint.craneserver.gcode.GCodeFile;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
