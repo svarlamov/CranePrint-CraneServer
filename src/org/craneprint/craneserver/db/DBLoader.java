@@ -40,7 +40,7 @@ public class DBLoader implements ServletContextListener {
      */
     public void contextInitialized(ServletContextEvent arg0)  {
     	db = new DBManager(port, dbHost, dbName);
-    	arg0.getServletContext().setAttribute("dbManager", db);
+    	arg0.getServletContext().setAttribute("org.craneprint.craneserver.db.dbManager", db);
     }
 	
 }

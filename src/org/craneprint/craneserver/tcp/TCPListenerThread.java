@@ -29,6 +29,7 @@ public class TCPListenerThread implements Runnable {
 		// TODO: Actually set these values
 		context = sc;
 		cranePort = crp;
+		System.out.println("CRANEPORT: " + crp);
 	}
 
 	@Override
@@ -47,6 +48,7 @@ public class TCPListenerThread implements Runnable {
 					JSONObject jo = parseForObj(receivedText);
 					int type = getType(jo);
 					if(type == RequestType.JOB_COMPLETE){
+						this.getQueueManager().toString();
 						this.getQueueManager().printComplete((int)(long)jo.get("printerId"));
 					}
 					if(type == RequestType.GET_NEW_JOB){
@@ -84,6 +86,6 @@ public class TCPListenerThread implements Runnable {
 	}
 	
 	private QueueManager getQueueManager(){
-		return (QueueManager)context.getAttribute("queueManager");
+		return (QueueManager)context.getAttribute("org.craneprint.craneserver.queue.queueManager");
 	}
 }

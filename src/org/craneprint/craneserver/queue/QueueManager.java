@@ -64,10 +64,10 @@ public class QueueManager {
 	}
 	
 	private DBManager getDBManager(){
-		return (DBManager)context.getAttribute("dbManager");
+		return (DBManager)context.getAttribute("org.craneprint.craneserver.db.dbManager");
 	}
 	
 	private PrintersManager getPrintersManager(){
-		return (PrintersManager)context.getAttribute("printersManager");
+		return (PrintersManager)context.getAttribute("org.craneprint.craneserver.printers.printersManager");
 	}
 }

@@ -43,14 +43,14 @@ public class Craneprint_craneserverUI extends UI implements DetachListener{
 	}
 	
 	public PrintersManager getPrintersManager(){
-		return (PrintersManager)servletContext.getAttribute("printersManager");
+		return (PrintersManager)servletContext.getAttribute("org.craneprint.craneserver.printers.printersManager");
 	}
 	
 	public DBManager getDBManager(){
-		return (DBManager)servletContext.getAttribute("dbManager");
+		return (DBManager)servletContext.getAttribute("org.craneprint.craneserver.db.dbManager");
 	}
 	
 	public QueueManager getQueueManager(){
-		return (QueueManager)servletContext.getAttribute("queueManager");
+		return (QueueManager)servletContext.getAttribute("org.craneprint.craneserver.queue.queueManager");
 	}
 }

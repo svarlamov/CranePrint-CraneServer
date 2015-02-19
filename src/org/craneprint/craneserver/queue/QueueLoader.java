@@ -2,13 +2,13 @@ package org.craneprint.craneserver.queue;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebServlet;
+import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpServlet;
 
 /**
  * Servlet implementation class QueueLoader
  */
-@WebServlet(description = "Load the queue once for use within the application", urlPatterns = { "/QueueLoader" })
+@WebListener
 public class QueueLoader extends HttpServlet implements ServletContextListener {
 	private QueueManager qm;
        
@@ -32,7 +32,7 @@ public class QueueLoader extends HttpServlet implements ServletContextListener {
      */
     public void contextInitialized(ServletContextEvent arg0)  { 
     	qm = new QueueManager(arg0.getServletContext());
-    	arg0.getServletContext().setAttribute("queueManager", qm);
+    	arg0.getServletContext().setAttribute("org.craneprint.craneserver.queue.queueManager", qm);
     }
 
 }

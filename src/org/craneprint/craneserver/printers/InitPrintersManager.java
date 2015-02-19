@@ -32,7 +32,7 @@ public class InitPrintersManager implements ServletContextListener {
          // TODO Auto-generated method stub
     	pm = new PrintersManager();
     	pm.loadAll();
-    	arg0.getServletContext().setAttribute("printersManager", pm);
+    	arg0.getServletContext().setAttribute("org.craneprint.craneserver.printers.printersManager", pm);
     }
 	
 }

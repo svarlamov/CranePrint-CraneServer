@@ -40,7 +40,7 @@ public class TCPContext implements ServletContextListener {
     	TCPListenerThread tcp = new TCPListenerThread(arg0.getServletContext(), cranePort);
     	Thread thread = new Thread(tcp);
     	thread.start();
-    	arg0.getServletContext().setAttribute("tcpThread", thread);
+    	arg0.getServletContext().setAttribute("org.craneprint.craneserver.tcp.tcpThread", thread);
     }
 	
 }
