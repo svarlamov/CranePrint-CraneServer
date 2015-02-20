@@ -3,6 +3,7 @@ package org.craneprint.craneserver.printers;
 import java.io.IOException;
 
 import org.craneprint.craneserver.gcode.GCodeFile;
+import org.craneprint.craneserver.tcp.RequestType;
 import org.craneprint.craneserver.tcp.TCPTransmitter;
 import org.craneprint.craneserver.ui.HandShake;
 import org.json.simple.parser.ParseException;
@@ -20,13 +21,8 @@ public class PrinterConnection {
 		tcp = new TCPTransmitter(ipAddress, port);
 	}
 	
-	public HandShake initHandShake(){
-		HandShake hs = null;
-		try {
-			hs = tcp.sendHandShake();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+	public HandShake initHandShake() throws IOException, ParseException{
+		HandShake hs = tcp.sendHandShake();
 		return hs;
 	}
 	
@@ -40,7 +36,7 @@ public class PrinterConnection {
 	}
 	
 	public void sendQueueEmpty() throws IOException {
-		tcp.sendCommand("{\"resp\":\"nothingInQueue\"}\n");
+		tcp.sendCommand("{\"type\":\"" + RequestType.QUEUE_EMPTY + "\"}\n");
 	}
 	
 	public int getPrinterStatus(){

@@ -5,8 +5,8 @@ import java.io.IOException;
 import javax.servlet.ServletContext;
 
 import org.craneprint.craneserver.db.DBManager;
-import org.craneprint.craneserver.db.PrintStatus;
 import org.craneprint.craneserver.gcode.GCodeFile;
+import org.craneprint.craneserver.gcode.PrintStatus;
 import org.craneprint.craneserver.printers.PrintersManager;
 import org.craneprint.craneserver.ui.Craneprint_craneserverUI;
 import org.json.simple.parser.ParseException;

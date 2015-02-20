@@ -1,5 +1,6 @@
 package org.craneprint.craneserver.printers;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -10,6 +11,7 @@ import org.craneprint.craneserver.ui.GetServerSettings;
 import org.craneprint.craneserver.ui.HandShake;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 
 import com.vaadin.ui.UI;
 
@@ -48,7 +50,7 @@ public class PrintersManager {
 		return printers.get(index);
 	}
 	
-	public HandShake doHandShake(int index){
+	public HandShake doHandShake(int index) throws IOException, ParseException{
 		// Find the printer to handshake with, initiate the connection and pass back the values
 		return printers.get(index).getPrinterConnection().initHandShake();
 	}

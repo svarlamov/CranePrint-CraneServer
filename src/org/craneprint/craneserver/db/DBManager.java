@@ -5,6 +5,8 @@ import java.net.UnknownHostException;
 import java.util.Date;
 
 import org.craneprint.craneserver.gcode.GCodeFile;
+import org.craneprint.craneserver.gcode.PrintStatus;
+import org.craneprint.craneserver.user_composites.MyPrintsTab;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -14,7 +16,11 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
 
 public class DBManager {
 	private final int port;
@@ -48,12 +54,9 @@ public class DBManager {
 	}
 	
 	public void addFileToQueue(int printerId, GCodeFile f){
-		/**** Get database ****/
-		DB db = this.getDB();
-	 
 		/**** Get collection / table from the printer's collection ****/
 		// if collection doesn't exist, MongoDB will create it for you
-		DBCollection coll = db.getCollection(Integer.toString(printerId));
+		DBCollection coll = getColl(printerId);
 	 
 		/**** Insert ****/
 		// create a document to store key and value
@@ -72,9 +75,6 @@ public class DBManager {
 	}
 	
 	public void updatePrintFailure(int printerId){
-		/**** Get database ****/
-		DB db = this.getDB();
-	 
 		/**** Get collection / table from the printer's collection ****/
 		DBCollection coll = getColl(printerId);
 		
@@ -101,12 +101,9 @@ public class DBManager {
 	}
 	
 	public boolean isQueueEmpty(int printerId){
-		/**** Get database ****/
-		DB db = this.getDB();
-	 
 		/**** Get collection / table from the printer's collection ****/
 		// if collection doesn't exist, MongoDB will create it for you
-		DBCollection coll = db.getCollection(Integer.toString(printerId));
+		DBCollection coll = getColl(printerId);
 		
 		/**** Find and display ****/
 		DBObject searchQuery = buildStatusQuery();
@@ -134,9 +131,6 @@ public class DBManager {
 	}
 	
 	public void finishFile(int printerId, int status){
-		/**** Get database ****/
-		DB db = this.getDB();
-	 
 		/**** Get collection / table from the printer's collection ****/
 		DBCollection coll = getColl(printerId);
 		
@@ -149,11 +143,45 @@ public class DBManager {
 		while (cursor.hasNext()) {
 			n = (BasicDBObject)cursor.next();
 		}
-	 
+		
 		BasicDBObject newDocument = new BasicDBObject();
 		newDocument.put("printedTime", new Date().getTime());
 		newDocument.put("filamentUsed", n.getLong("filamentUsage"));
 		newDocument.put("printStatus", status);
+	 
+		BasicDBObject updateObj = new BasicDBObject();
+		updateObj.put("$set", newDocument);
+	 
+		coll.update(query, updateObj);
+	}
+	
+	public boolean cancelPrint(BasicDBObject b, int pid){
+		/**** Get database ****/
+		DB db = this.getDB();
+	 
+		/**** Get collection / table from the printer's collection ****/
+		DBCollection coll = getColl(pid);
+		
+		/**** Update ****/
+		// search document for the correct file and 
+		BasicDBObject query = new BasicDBObject();
+		query.put("id", b.get("id"));
+		DBCursor cursor = coll.find(query);
+		BasicDBObject n = null;
+		while (cursor.hasNext()) {
+			n = (BasicDBObject)cursor.next();
+		}
+		if(n != null){
+			if(n.getInt("printStatus") == PrintStatus.IN_QUE){
+				
+			} else
+				return false;
+		} else 
+			return false;
+		BasicDBObject newDocument = new BasicDBObject();
+		newDocument.put("printedTime", -1L);
+		newDocument.put("filamentUsed", 0);
+		newDocument.put("printStatus", PrintStatus.CANCELLED);
 	 
 		BasicDBObject updateObj = new BasicDBObject();
 		updateObj.put("$set", newDocument);
@@ -229,9 +257,11 @@ public class DBManager {
 		// Name   Status   Filament Required(g)   Filament Used(g)   Time Added   Time Printed
 		// ...    ...      ...                    ...                ...          ...
 		t.addContainerProperty("Name", String.class, null);
-		t.addContainerProperty("Status", String.class, null);
+		//t.addContainerProperty("Status", String.class, null);
+		t.addContainerProperty("Status", VerticalLayout.class, null);
 		t.addContainerProperty("Filament Required(g)", Integer.class, null);
 		t.addContainerProperty("Filament Used(g)", Integer.class, null);
+		t.addContainerProperty("Printer", Integer.class, null);
 		t.addContainerProperty("Time Added", String.class, null);
 		t.addContainerProperty("Time Printed", String.class, null);
 		
@@ -246,17 +276,31 @@ public class DBManager {
 	}
 	
 	private Object[] getPrintRow(BasicDBObject n){
+		// TODO: Replace with list of printers and search all collections etc...
+		int printerId = 0;
 		Object[] o = new Object[/*Number of Columns*/6];
 		o[0] = n.getString("name");
-		o[1] = PrintStatus.resolveToString(n.getInt("printStatus"));
+		// TODO: Add a cancel button here!
+		if(n.getInt("printStatus") == PrintStatus.IN_QUE){
+			VerticalLayout v = new VerticalLayout();
+			Button b = new Button();
+			b.setCaption("Cancel");
+			b.addClickListener(new ClickListener(){
+			    public void buttonClick(ClickEvent event){
+			        boolean b = cancelPrint(n, printerId);
+			      }
+			    });
+			}
+		o[1] = PrintStatus.resolveToString(n.getInt("printStatus"));         
 		o[2] = n.getInt("filamentUsage");
-		o[3] = n.getInt("filamentUsed");
-		o[4] = new Date(n.getLong("addedTime")).toGMTString();
+		o[3] = printerId;
+		o[4] = n.getInt("filamentUsed");
+		o[5] = new Date(n.getLong("addedTime")).toGMTString();
 		long p = n.getLong("printedTime");
 		if(p == -1)
-			o[5] = "Not Yet Complete";
+			o[6] = "Not Yet Complete";
 		else
-			o[5] = new Date(p).toGMTString();
+			o[6] = new Date(p).toGMTString();
 		return o;
 	}
 	
