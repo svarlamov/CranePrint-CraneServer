@@ -8,7 +8,6 @@ import org.craneprint.craneserver.gcode.GCodeFile;
 import org.craneprint.craneserver.queue.QueueManager;
 import org.craneprint.craneserver.ui.Craneprint_craneserverUI;
 import org.craneprint.craneserver.ui.GetServerSettings;
-import org.craneprint.craneserver.ui.HandShake;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;

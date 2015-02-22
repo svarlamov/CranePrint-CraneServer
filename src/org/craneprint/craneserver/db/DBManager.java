@@ -4,8 +4,11 @@ import java.io.File;
 import java.net.UnknownHostException;
 import java.util.Date;
 
+import javax.servlet.ServletContext;
+
 import org.craneprint.craneserver.gcode.GCodeFile;
 import org.craneprint.craneserver.gcode.PrintStatus;
+import org.craneprint.craneserver.printers.PrintersManager;
 import org.craneprint.craneserver.user_composites.MyPrintsTab;
 
 import com.mongodb.BasicDBList;
@@ -16,9 +19,12 @@ import com.mongodb.DBCursor;
 import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoException;
+import com.vaadin.server.Page;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 
@@ -27,11 +33,13 @@ public class DBManager {
 	private final String dbHost;
 	private MongoClient mongo;
 	private final String dbName;
+	private ServletContext context;
 	
-	public DBManager(int p, String host, String name){
+	public DBManager(int p, String host, String name, ServletContext sc){
 		this.port = p;
 		this.dbHost = host;
 		this.dbName = name;
+		this.context = sc;
 		this.connectToDB();
 	}
 	
@@ -156,9 +164,6 @@ public class DBManager {
 	}
 	
 	public boolean cancelPrint(BasicDBObject b, int pid){
-		/**** Get database ****/
-		DB db = this.getDB();
-	 
 		/**** Get collection / table from the printer's collection ****/
 		DBCollection coll = getColl(pid);
 		
@@ -173,20 +178,18 @@ public class DBManager {
 		}
 		if(n != null){
 			if(n.getInt("printStatus") == PrintStatus.IN_QUE){
-				
-			} else
-				return false;
-		} else 
-			return false;
-		BasicDBObject newDocument = new BasicDBObject();
-		newDocument.put("printedTime", -1L);
-		newDocument.put("filamentUsed", 0);
-		newDocument.put("printStatus", PrintStatus.CANCELLED);
-	 
-		BasicDBObject updateObj = new BasicDBObject();
-		updateObj.put("$set", newDocument);
-	 
-		coll.update(query, updateObj);
+				BasicDBObject newDocument = new BasicDBObject();
+				newDocument.put("printStatus", PrintStatus.CANCELLED);
+				newDocument.put("printedTime", -2);
+				BasicDBObject updateObj = new BasicDBObject();
+				updateObj.put("$set", newDocument);
+				coll.update(query, updateObj);
+				return true;
+			} else if(n.getInt("printStatus") == PrintStatus.CANCELLED){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 	public GCodeFile getNextInQueue(int printerId){
@@ -233,7 +236,7 @@ public class DBManager {
 		return toPrint;
 	}
 	
-	public Table getPrintsForUser(String user){
+	public Table getPrintsForUser(String user, MyPrintsTab mpt){
 		// TODO: Check this for all printer collections <-- VERY IMPORTANT!!!
 		/**** Get database ****/
 		DB db = this.getDB();
@@ -261,7 +264,7 @@ public class DBManager {
 		t.addContainerProperty("Status", VerticalLayout.class, null);
 		t.addContainerProperty("Filament Required(g)", Integer.class, null);
 		t.addContainerProperty("Filament Used(g)", Integer.class, null);
-		t.addContainerProperty("Printer", Integer.class, null);
+		t.addContainerProperty("Printer", String.class, null);
 		t.addContainerProperty("Time Added", String.class, null);
 		t.addContainerProperty("Time Printed", String.class, null);
 		
@@ -269,16 +272,16 @@ public class DBManager {
 		int row = 0;
 		while(cursor.hasNext()){
 			BasicDBObject n = (BasicDBObject)cursor.next();
-			t.addItem(this.getPrintRow(n), ++row);
+			t.addItem(this.getPrintRow(n, mpt), ++row);
 		}
 		
 		return t;
 	}
 	
-	private Object[] getPrintRow(BasicDBObject n){
+	private Object[] getPrintRow(BasicDBObject n, MyPrintsTab mpt){
 		// TODO: Replace with list of printers and search all collections etc...
 		int printerId = 0;
-		Object[] o = new Object[/*Number of Columns*/6];
+		Object[] o = new Object[/*Number of Columns*/7];
 		o[0] = n.getString("name");
 		// TODO: Add a cancel button here!
 		if(n.getInt("printStatus") == PrintStatus.IN_QUE){
@@ -288,17 +291,40 @@ public class DBManager {
 			b.addClickListener(new ClickListener(){
 			    public void buttonClick(ClickEvent event){
 			        boolean b = cancelPrint(n, printerId);
-			      }
-			    });
-			}
-		o[1] = PrintStatus.resolveToString(n.getInt("printStatus"));         
+			        if(b) {
+			        	new Notification("Print Cancelled",
+			        		    "Print Cancelled",
+			        		    Notification.TYPE_TRAY_NOTIFICATION, true)
+			        		    .show(Page.getCurrent());
+			        	mpt.refreshTable();
+			        } else {
+			        	new Notification("Error",
+			        		    "Print Can Not Be Cancelled",
+			        		    Notification.TYPE_TRAY_NOTIFICATION, true)
+			        		    .show(Page.getCurrent());
+			        	mpt.refreshTable();
+			        }
+			    }
+			});
+			v.addComponent(b);
+			o[1] = v;
+		} else {
+			Label l = new Label();
+			l.setValue(PrintStatus.resolveToString(n.getInt("printStatus")));
+			VerticalLayout vl = new VerticalLayout();
+			vl.addComponent(l);
+			o[1] = vl;
+		}
 		o[2] = n.getInt("filamentUsage");
-		o[3] = printerId;
-		o[4] = n.getInt("filamentUsed");
+		o[3] = n.getInt("filamentUsed");
+		PrintersManager pm = (PrintersManager)context.getAttribute("org.craneprint.craneserver.printers.printersManager");
+		o[4] = pm.getPrinter(printerId).getName();
 		o[5] = new Date(n.getLong("addedTime")).toGMTString();
 		long p = n.getLong("printedTime");
 		if(p == -1)
 			o[6] = "Not Yet Complete";
+		else if(p == -2)
+			o[6] = "Cancelled";
 		else
 			o[6] = new Date(p).toGMTString();
 		return o;

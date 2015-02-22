@@ -8,6 +8,7 @@ import org.craneprint.craneserver.gcode.GCodeUploadedEvent;
 import org.craneprint.craneserver.gcode.GCodeUploadedListener;
 import org.craneprint.craneserver.gcode.GCodeUploader;
 import org.craneprint.craneserver.help.HelpTab;
+import org.craneprint.craneserver.printers.HandShake;
 import org.craneprint.craneserver.printers.PrintersManager;
 import org.craneprint.craneserver.slicing.SlicingTab;
 import org.craneprint.craneserver.user_composites.MyPrintsTab;
@@ -213,5 +214,9 @@ public class PrintComposite extends CustomComponent{
 		for(int i = 0; i < copies; i++)
 			printersManager.addFile(printerAccordion.getTabIndex(), toPrint);
 		new Notification("Success", copies +" Copies of Your File Were Added to the Print Queue", Notification.Type.ASSISTIVE_NOTIFICATION).show(Page.getCurrent());
+	}
+	
+	public void refreshPrintsTable(){
+		myPrintsTab.refreshTable();
 	}
 }

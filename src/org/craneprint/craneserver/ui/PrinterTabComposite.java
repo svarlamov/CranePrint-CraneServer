@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Set;
 
+import org.craneprint.craneserver.printers.HandShake;
 import org.craneprint.craneserver.printers.PrinterStatus;
 import org.json.simple.parser.ParseException;
 

@@ -10,7 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import org.craneprint.craneserver.gcode.GCodeFile;
-import org.craneprint.craneserver.ui.HandShake;
+import org.craneprint.craneserver.printers.HandShake;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
@@ -61,7 +61,7 @@ public class TCPTransmitter {
 	    return stringBuilder.toString();
 	}
 	
-	public String sendCommand(String toSend) throws IOException{
+	public String sendCommand(String toSend) throws IOException {
 		String resp;
 		System.out.println("CHICK PORT: " + chickPort);
 		Socket clientSocket = new Socket(ip, chickPort);
