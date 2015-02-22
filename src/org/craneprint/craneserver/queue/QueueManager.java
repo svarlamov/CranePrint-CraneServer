@@ -7,11 +7,10 @@ import javax.servlet.ServletContext;
 import org.craneprint.craneserver.db.DBManager;
 import org.craneprint.craneserver.gcode.GCodeFile;
 import org.craneprint.craneserver.gcode.PrintStatus;
+import org.craneprint.craneserver.printers.HandShake;
+import org.craneprint.craneserver.printers.PrinterStatus;
 import org.craneprint.craneserver.printers.PrintersManager;
-import org.craneprint.craneserver.ui.Craneprint_craneserverUI;
 import org.json.simple.parser.ParseException;
-
-import com.vaadin.ui.UI;
 
 public class QueueManager {
 	private ServletContext context;
@@ -20,14 +19,23 @@ public class QueueManager {
 		context = sc;
 	}
 	
-	public void addFileToQueue(int printerId, GCodeFile f){
-		if(this.getDBManager().isQueueEmpty(printerId)){
+	public boolean addFileToQueue(int printerId, GCodeFile f){
+		boolean success = true;
+		HandShake hs = null;
+		try {
+			hs = this.getPrintersManager().doHandShake(printerId);
+		} catch (IOException | ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		if(this.getDBManager().isQueueEmpty(printerId) && hs != null && hs.getStatus() != PrinterStatus.FAILED_TO_CONNECT_CODE && hs.getStatus() != PrinterStatus.UNKNOWN_ERROR_CODE && hs.getStatus() != PrinterStatus.NO_DATA_CODE && hs.getStatus() != PrinterStatus.FAILED_TO_AUTHENTICATE_CODE){
 			this.getDBManager().addFileToQueue(printerId, f);
-			sendNextInQueue(printerId);
+			success = sendNextInQueue(printerId);
 		}
 		else {
 			this.getDBManager().addFileToQueue(printerId, f);
 		}
+		return success;
 	}
 	
 	public boolean sendNextInQueue(int printerId){
@@ -36,7 +44,10 @@ public class QueueManager {
 		GCodeFile gcf = this.getDBManager().getNextInQueue(printerId);
 		if(gcf != null){
 			try {
-				this.getPrintersManager().getPrinter(printerId).getPrinterConnection().sendFile(gcf);
+				boolean b = this.getPrintersManager().getPrinter(printerId).getPrinterConnection().sendFile(gcf);
+				//TODO: Add some code to replace the status of the print to failed
+				if(!b)
+					success = false;
 			} catch (IOException e) {
 				//TODO: Add some code to replace the status of the print to failed
 				success = false;
@@ -45,7 +56,7 @@ public class QueueManager {
 				//TODO: Add some code to replace the status of the print to failed
 				success = false;
 				e.printStackTrace();
-			}
+			} 
 			return success;
 		}
 		else {

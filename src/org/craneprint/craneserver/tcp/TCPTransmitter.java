@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
 
 import org.craneprint.craneserver.gcode.GCodeFile;
 import org.craneprint.craneserver.printers.HandShake;
@@ -19,6 +20,8 @@ public class TCPTransmitter {
 	//private final int printerId;
 	private final int chickPort;
 	private ServerSocket welcomeSocket;
+	private HandShake lastHandShake = null;
+	private long lastHandShakeT = -1;
 	
 	public TCPTransmitter(String i, int chp){
 		// TODO: Actually Set these values
@@ -27,12 +30,22 @@ public class TCPTransmitter {
 		chickPort = chp;
 	}
 	
-	public HandShake sendHandShake() throws IOException, ParseException{
+	private HandShake sendHandShake() throws IOException, ParseException {
 		JSONObject obj = new JSONObject();
 	    obj.put("type", RequestType.HAND_SHAKE_CODE);
 	    obj.put("password", "password");
 	    String resp = sendCommand(obj.toJSONString());
 	    return new HandShake(resp);
+	}
+	
+	public HandShake getHandShake() throws IOException, ParseException {
+		if(lastHandShake != null && lastHandShakeT - new Date().getTime() < 180000)
+			return lastHandShake;
+		else {
+			lastHandShake = sendHandShake();
+			lastHandShakeT = new Date().getTime();
+			return lastHandShake;
+		}
 	}
 	
 	public boolean sendFile(GCodeFile gcf) throws IOException, ParseException{
@@ -46,6 +59,8 @@ public class TCPTransmitter {
 	    obj.put("user", "testUser");
 	    obj.put("password", "password");
 	    String resp = sendCommand(obj.toJSONString());
+	    if(resp.length() < 1)
+	    	return false;
 	    return true;
 	}
 	

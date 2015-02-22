@@ -65,7 +65,7 @@ public class DBManager {
 		/**** Get collection / table from the printer's collection ****/
 		// if collection doesn't exist, MongoDB will create it for you
 		DBCollection coll = getColl(printerId);
-	 
+		
 		/**** Insert ****/
 		// create a document to store key and value
 		BasicDBObject document = new BasicDBObject();
@@ -151,16 +151,19 @@ public class DBManager {
 		while (cursor.hasNext()) {
 			n = (BasicDBObject)cursor.next();
 		}
-		
-		BasicDBObject newDocument = new BasicDBObject();
-		newDocument.put("printedTime", new Date().getTime());
-		newDocument.put("filamentUsed", n.getLong("filamentUsage"));
-		newDocument.put("printStatus", status);
+		if(n != null){
+			BasicDBObject newDocument = new BasicDBObject();
+			newDocument.put("printedTime", new Date().getTime());
+			newDocument.put("filamentUsed", n.getLong("filamentUsage"));
+			newDocument.put("printStatus", status);
 	 
-		BasicDBObject updateObj = new BasicDBObject();
-		updateObj.put("$set", newDocument);
+			BasicDBObject updateObj = new BasicDBObject();
+			updateObj.put("$set", newDocument);
 	 
-		coll.update(query, updateObj);
+			coll.update(query, updateObj);
+		} else {
+			System.out.println("Error, No Files are Currently Printing? What am I doing wrong?!");
+		}
 	}
 	
 	public boolean cancelPrint(BasicDBObject b, int pid){

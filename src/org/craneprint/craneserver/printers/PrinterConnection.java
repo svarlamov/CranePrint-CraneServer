@@ -21,7 +21,7 @@ public class PrinterConnection {
 	}
 	
 	public HandShake initHandShake() throws IOException, ParseException{
-		HandShake hs = tcp.sendHandShake();
+		HandShake hs = tcp.getHandShake();
 		return hs;
 	}
 	
@@ -29,9 +29,9 @@ public class PrinterConnection {
 		return "MODIFY";
 	}
 	
-	public void sendFile(GCodeFile f) throws IOException, ParseException{
+	public boolean sendFile(GCodeFile f) throws IOException, ParseException{
 		// TODO: Don't forget about setting up the notes variable...
-		tcp.sendFile(f);
+		return tcp.sendFile(f);
 	}
 	
 	public void sendQueueEmpty() throws IOException {

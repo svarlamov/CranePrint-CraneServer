@@ -76,7 +76,9 @@ public class PrintComposite extends CustomComponent{
 		
 		printersManager = ui.getPrintersManager();
 		for(int i = 0; i < printersManager.getSize(); i++){
-			printerAccordion.addTab(new PrinterTabComposite(), printersManager.getPrinter(i).getName());
+			PrinterTabComposite ptb = new PrinterTabComposite();
+			printerAccordion.addTab(ptb, printersManager.getPrinter(i).getName());
+			ptb.fillComposite();
 		}
 	}
 
@@ -213,7 +215,7 @@ public class PrintComposite extends CustomComponent{
 		toPrint.setNotes(notes);
 		for(int i = 0; i < copies; i++)
 			printersManager.addFile(printerAccordion.getTabIndex(), toPrint);
-		new Notification("Success", copies +" Copies of Your File Were Added to the Print Queue", Notification.Type.ASSISTIVE_NOTIFICATION).show(Page.getCurrent());
+		new Notification("Success", copies +" Copies of Your File Were Added to the Print Queue", Notification.Type.TRAY_NOTIFICATION).show(Page.getCurrent());
 	}
 	
 	public void refreshPrintsTable(){
