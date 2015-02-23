@@ -48,11 +48,10 @@ public class TCPListenerThread implements Runnable {
 					JSONObject jo = parseForObj(receivedText);
 					int type = getType(jo);
 					if(type == RequestType.JOB_COMPLETE){
-						//this.getQueueManager().toString();
-						this.getQueueManager().printComplete(new Long((long)jo.get("printerId")).intValue());
+						this.getQueueManager().printComplete((int)(long)jo.get("printerId"));
 					}
 					if(type == RequestType.GET_NEW_JOB){
-						this.getQueueManager().sendNextInQueue(new Long((long)jo.get("printerId")).intValue());
+						this.getQueueManager().sendNextInQueue((int)(long)jo.get("printerId"));
 					}
 					outToAgent.writeBytes("{\"resp\":\"success\"}\n");
 					//outToAgent.close();

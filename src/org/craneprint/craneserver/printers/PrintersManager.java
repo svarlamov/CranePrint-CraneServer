@@ -45,8 +45,17 @@ public class PrintersManager {
 		return printers.size();
 	}
 	
-	public Printer getPrinter(int index){
-		return printers.get(index);
+	/**
+	 * 
+	 * @param id The id of the Printer
+	 * @return The printer of that id, and in the case where the printer can not be found we return null
+	 */
+	public Printer getPrinter(int id){
+		for(Printer p : printers){
+			if(p.getId() == id)
+				return p;
+		}
+		return null;
 	}
 	
 	public HandShake doHandShake(int index) throws IOException, ParseException{

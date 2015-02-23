@@ -148,11 +148,10 @@ public class FileTabComposite extends CustomComponent {
 		    public void buttonClick(ClickEvent event){
 		    	// Deletes GCodeFile and remove it from the arraylist and accordion
 		    	Component c = getParent();
-		    	Component d = c.getParent();
-		    	Component e = d.getParent();
-		    	Component f = e.getParent();
-		    	Component g = f.getParent();
-		    	PrintComposite h = (PrintComposite)g.getParent();
+		    	while(!(c instanceof PrintComposite)){
+		    		c = c.getParent();
+		    	}
+		    	PrintComposite h = (PrintComposite)c;
 		    	h.deleteFile();
 		    }
 		  }
