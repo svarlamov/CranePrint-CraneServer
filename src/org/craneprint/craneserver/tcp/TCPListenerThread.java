@@ -49,10 +49,10 @@ public class TCPListenerThread implements Runnable {
 					int type = getType(jo);
 					if(type == RequestType.JOB_COMPLETE){
 						//this.getQueueManager().toString();
-						this.getQueueManager().printComplete((int)(long)jo.get("printerId"));
+						this.getQueueManager().printComplete((int)jo.get("printerId"));
 					}
 					if(type == RequestType.GET_NEW_JOB){
-						this.getQueueManager().sendNextInQueue((int)(long)jo.get("printerId"));
+						this.getQueueManager().sendNextInQueue((int)jo.get("printerId"));
 					}
 					outToAgent.writeBytes("{\"resp\":\"success\"}\n");
 					//outToAgent.close();

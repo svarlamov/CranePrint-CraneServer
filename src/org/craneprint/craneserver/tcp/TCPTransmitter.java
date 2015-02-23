@@ -12,6 +12,7 @@ import java.util.Date;
 
 import org.craneprint.craneserver.gcode.GCodeFile;
 import org.craneprint.craneserver.printers.HandShake;
+import org.craneprint.craneserver.printers.PrinterStatus;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
@@ -39,7 +40,12 @@ public class TCPTransmitter {
 	}
 	
 	public HandShake getHandShake() throws IOException, ParseException {
-		if(lastHandShake != null && lastHandShakeT - new Date().getTime() < 180000)
+		if (lastHandShake != null && new Date().getTime() - lastHandShakeT < 10000 && (lastHandShake.getStatus() == PrinterStatus.FAILED_TO_CONNECT_CODE || lastHandShake.getStatus() == PrinterStatus.UNKNOWN_ERROR_CODE || lastHandShake.getStatus() == PrinterStatus.NO_DATA_CODE || lastHandShake.getStatus() == PrinterStatus.FAILED_TO_AUTHENTICATE_CODE)){
+			lastHandShake = sendHandShake();
+			lastHandShakeT = new Date().getTime();
+			return lastHandShake;
+		}
+	    else if(lastHandShake != null && new Date().getTime() - lastHandShakeT < 180000)
 			return lastHandShake;
 		else {
 			lastHandShake = sendHandShake();

@@ -176,12 +176,32 @@ public class PrinterTabComposite extends CustomComponent {
 		try {
 			hs = h.doHandShake();
 		} catch (IOException e1) {
+			stateVLabel.setValue("");
+			queueVLabel.setValue("");
+			notesArea.setValue("");
+			// Reset the tools stuff
+			leftTools.removeAllComponents();
+			rightTools.removeAllComponents();
+			// Set them up now
+			leftTools.addComponent(new Label("Tool0: "));
+			rightTools.addComponent(new Label(""));
+			
 			connectButton.setCaption("Could Not Connect");
 			new Notification("Could Not Connect",
         		    "Printer is Offline",
         		    Notification.TYPE_TRAY_NOTIFICATION, true)
         		    .show(Page.getCurrent());
 		} catch (ParseException e1) {
+			stateVLabel.setValue("");
+			queueVLabel.setValue("");
+			notesArea.setValue("");
+			// Reset the tools stuff
+			leftTools.removeAllComponents();
+			rightTools.removeAllComponents();
+			// Set them up now
+			leftTools.addComponent(new Label("Tool0: "));
+			rightTools.addComponent(new Label(""));
+			
 			connectButton.setCaption("Could Not Connect");
 			new Notification("Error Parsing Response",
         		    "Could Not Understand Printer's Response",
