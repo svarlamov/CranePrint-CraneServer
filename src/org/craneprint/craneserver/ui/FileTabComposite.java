@@ -160,5 +160,13 @@ public class FileTabComposite extends CustomComponent {
 		
 		return mainLayout;
 	}
+	
+	public String getNotes(){
+		return notesArea.getValue();
+	}
+	
+	public void setNotes(String s){
+		notesArea.setValue(s);
+	}
 
 }

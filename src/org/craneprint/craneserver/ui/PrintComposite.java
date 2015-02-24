@@ -1,8 +1,11 @@
 package org.craneprint.craneserver.ui;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import org.craneprint.craneserver.gcode.CraneCodePacker;
+import org.craneprint.craneserver.gcode.FolderLoad;
 import org.craneprint.craneserver.gcode.GCodeFile;
 import org.craneprint.craneserver.gcode.GCodeUploadedEvent;
 import org.craneprint.craneserver.gcode.GCodeUploadedListener;
@@ -61,6 +64,7 @@ public class PrintComposite extends CustomComponent{
 	private GCodeUploader gcodeUploader = new GCodeUploader();
 	private ArrayList<GCodeFile> fileArray = new ArrayList<GCodeFile>();
 	private PrintersManager printersManager;
+	private final File folder = new File(System.getProperty("user.home") + File.separator + "CranePrint Uploads" + File.separator + /*TODO: Replace w/ session user*/"testUser");
 	
 	/**
 	 * The constructor should first build the main layout, set the
@@ -71,6 +75,18 @@ public class PrintComposite extends CustomComponent{
 	 */
 	public PrintComposite(Craneprint_craneserverUI u) {
 		ui = u;
+		
+		FolderLoad fl = new FolderLoad(folder.getPath(), /*TODO: Replace w/ session user*/ "testUser");
+		try {
+			fileArray = fl.loadAllFiles();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			new Notification("Error Loading Files",
+                    "There was an Error Loading all of Your Files!",
+                    Notification.Type.TRAY_NOTIFICATION).show(Page.getCurrent());
+			e.printStackTrace();
+		}
+		
 		buildMainLayout();
 		setCompositionRoot(mainLayout);
 		
@@ -175,6 +191,11 @@ public class PrintComposite extends CustomComponent{
 		fileAccordion.setImmediate(false);
 		fileAccordion.setWidth("100%");
 		fileAccordion.setHeight("-1px");
+		for(GCodeFile g : fileArray){
+			FileTabComposite ftc = new FileTabComposite();
+			ftc.setNotes(g.getNotes());
+			fileAccordion.addTab(new FileTabComposite(), g.getName());
+		}
 		
 		// filePanel
 		filePanel = new Panel("GCode Files");
@@ -220,5 +241,21 @@ public class PrintComposite extends CustomComponent{
 	
 	public void refreshPrintsTable(){
 		myPrintsTab.refreshTable();
+	}
+	
+	public void packMetaFiles(){
+		for(int i = 0; i < fileAccordion.getComponentCount(); i++){
+			GCodeFile g = fileArray.get(i);
+			FileTabComposite ftc = (FileTabComposite)fileAccordion.getTab(i).getComponent();
+			g.setNotes(ftc.getNotes());
+			CraneCodePacker ccp = new CraneCodePacker(g);
+			try {
+				ccp.pack();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				new Notification("Error", "Could Not Close out Your Current Files", Notification.Type.TRAY_NOTIFICATION).show(Page.getCurrent());
+				e.printStackTrace();
+			}
+		}
 	}
 }

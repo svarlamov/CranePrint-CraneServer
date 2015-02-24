@@ -2,6 +2,7 @@ package org.craneprint.craneserver.gcode;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -33,8 +34,8 @@ public class GCodeUploader implements Receiver, SucceededListener, FailedListene
     		boolean b = folder.mkdirs();
     		if(!b){
     			new Notification("Could Not Open File",
-                        "There was an error creating the directory on the server",
-                        Notification.Type.ERROR_MESSAGE).show(Page.getCurrent());
+                        "There was an Error Creating the Directory on the Server",
+                        Notification.Type.TRAY_NOTIFICATION).show(Page.getCurrent());
     			return null;
     		}
     	}
@@ -56,17 +57,27 @@ public class GCodeUploader implements Receiver, SucceededListener, FailedListene
     
     // This is called if the upload succeeds
     public void uploadSucceeded(SucceededEvent event) {
-        //TODO: Create a "GCodeFile" and add it to the accordion in the parent class
-    	GCodeFile gcf = new GCodeFile(file, fileName, user);
+        // Create a "GCodeFile" and add it to the accordion in the parent class
+    	event.getComponent();
+    	GCodeFile gcf = new GCodeFile(file, fileName, "", user);
+    	CraneCodePacker c = new CraneCodePacker(gcf);
+    	try {
+			c.pack();
+		} catch (IOException e) {
+			new Notification("Error Uploading File",
+	                "Could Not Write Metadata",
+	                Notification.Type.TRAY_NOTIFICATION).show(Page.getCurrent());
+			e.printStackTrace();
+		}
     	fireEvent(gcf);
     }
     
     // This is called if the upload fails.
     public void uploadFailed(FailedEvent event) {
         // Tell the user that the upload failed
-    	new Notification("Error Uploading File<br/>",
+    	new Notification("Error Uploading File",
                 event.getReason().getMessage(),
-                Notification.Type.ERROR_MESSAGE).show(Page.getCurrent());
+                Notification.Type.TRAY_NOTIFICATION).show(Page.getCurrent());
     }
     
     public synchronized void addEventListener(GCodeUploadedListener listener)  {

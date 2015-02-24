@@ -11,13 +11,6 @@ public class GCodeFile {
 	private long printId;
 	private boolean complete = false;
 	
-	public GCodeFile(File f, String n, String ns, String u){
-		file = f;
-		name = n;
-		user = u;
-		notes = ns;
-	}
-	
 	public GCodeFile(File f, String n, String ns, String u, long id){
 		file = f;
 		name = n;
@@ -26,10 +19,10 @@ public class GCodeFile {
 		notes = ns;
 	}
 	
-	// By using this method we put a lot of trust in them setting up the notes before it is sent 
-	public GCodeFile(File f, String n, String u){
+	public GCodeFile(File f, String n, String ns, String u){
 		file = f;
 		name = n;
+		notes = ns;
 		user = u;
 	}
 	
@@ -37,6 +30,11 @@ public class GCodeFile {
 		return printId;
 	}
 	public boolean deleteFile(){
+		boolean success = true;
+		success = file.delete();
+		File meta = new File(file.getPath() + ".meta");
+		if(meta.exists())
+			success = meta.delete();
 		return file.delete();
 	}
 	
