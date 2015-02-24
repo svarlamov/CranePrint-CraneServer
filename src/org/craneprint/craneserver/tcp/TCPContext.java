@@ -29,6 +29,7 @@ public class TCPContext implements ServletContextListener {
      */
     public void contextDestroyed(ServletContextEvent arg0)  { 
          // TODO Auto-generated method stub
+    	thread.stop();
     	tcp.closeConnection();
     }
 
@@ -37,8 +38,8 @@ public class TCPContext implements ServletContextListener {
      */
     public void contextInitialized(ServletContextEvent arg0)  { 
          // TODO Implement for multiple printers
-    	TCPListenerThread tcp = new TCPListenerThread(arg0.getServletContext(), cranePort);
-    	Thread thread = new Thread(tcp);
+    	tcp = new TCPListenerThread(arg0.getServletContext(), cranePort);
+    	thread = new Thread(tcp);
     	thread.start();
     	arg0.getServletContext().setAttribute("org.craneprint.craneserver.tcp.tcpThread", thread);
     }

@@ -17,7 +17,11 @@ import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 
 public class GCodeUploader implements Receiver, SucceededListener, FailedListener {
-    private File file;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = -364033339938703999L;
+	private File file;
     private String fileName = "";
     private GCodeFile gcode = null;
     // TODO: Actually get the session user!!!

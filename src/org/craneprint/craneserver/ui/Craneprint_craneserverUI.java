@@ -27,19 +27,7 @@ public class Craneprint_craneserverUI extends UI implements DetachListener{
 
 	@WebServlet(value = "/*", asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = Craneprint_craneserverUI.class)
-	public static class Servlet extends VaadinServlet implements SessionDestroyListener {
-	    @Override
-	    public void sessionDestroy(SessionDestroyEvent event) {
-	    	System.out.println("Session Destroyed!");
-	        // Do session end stuff here
-	    	Collection<UI> uis = event.getSession().getUIs();
-	    	for(UI u : uis){
-	    		if(u instanceof Craneprint_craneserverUI){
-	    			Craneprint_craneserverUI cu = (Craneprint_craneserverUI)u;
-	    			cu.pc.packMetaFiles();
-	    		}
-	    	}
-	    }
+	public static class Servlet extends VaadinServlet { 
 	}
 
 	@Override
@@ -50,6 +38,7 @@ public class Craneprint_craneserverUI extends UI implements DetachListener{
 			System.out.println(en.nextElement());
 		}
 		pc = new PrintComposite(this);
+		
 		setContent(pc);
 	}
 	

@@ -67,9 +67,10 @@ public class TCPListenerThread implements Runnable {
 	public void closeConnection(){
 		try {
 			stop = true;
+			Thread.sleep(1000);
 			welcomeSocket.close();
 			System.out.println("TCPThread Stopped");
-		} catch(IOException e){
+		} catch(IOException | InterruptedException e){
 			e.printStackTrace();
 		}
 	}
