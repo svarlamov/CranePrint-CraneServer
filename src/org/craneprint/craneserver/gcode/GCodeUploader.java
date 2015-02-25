@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -16,7 +17,7 @@ import com.vaadin.ui.Upload.Receiver;
 import com.vaadin.ui.Upload.SucceededEvent;
 import com.vaadin.ui.Upload.SucceededListener;
 
-public class GCodeUploader implements Receiver, SucceededListener, FailedListener {
+public class GCodeUploader implements Receiver, SucceededListener, FailedListener, Serializable {
     /**
 	 * 
 	 */

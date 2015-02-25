@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.servlet.ServletContext;
+
 import org.craneprint.craneserver.gcode.GCodeFile;
 import org.craneprint.craneserver.queue.QueueManager;
 import org.craneprint.craneserver.ui.Craneprint_craneserverUI;
@@ -17,11 +19,12 @@ import com.vaadin.ui.UI;
 public class PrintersManager {
 	// A class to manage all printers that we can connect to. This class will be owned by the PrinterComposite
 	private ArrayList<Printer> printers = new ArrayList<Printer>();
+	private ServletContext context;
 	
-	public PrintersManager(){
-		super();
+	public PrintersManager(ServletContext sc){
+		context = sc;
 	}
-	
+
 	public ArrayList<Printer> loadAll(){
 		// TODO: Get all of the printers outlined in the settings, add them to "printers and then return "printers"
 		// Get all printers from the settings file and them add them into "printers"
@@ -64,9 +67,7 @@ public class PrintersManager {
 	}
 	
 	public void addFile(int index, GCodeFile f){
-		// TODO: Get the Printer, PrinterConnection, and then send it off!
-		//return printers.get(index).getPrinterConnection().sendFile(f);
-		Craneprint_craneserverUI ui = (Craneprint_craneserverUI)UI.getCurrent();
-		ui.getQueueManager().addFileToQueue(printers.get(index).getId(), f);
+		QueueManager q = (QueueManager)context.getAttribute("org.craneprint.craneserver.queue.queueManager");
+		q.addFileToQueue(printers.get(index).getId(), f);
 	}
 }

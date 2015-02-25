@@ -55,15 +55,16 @@ public class TCPTransmitter {
 	}
 	
 	public boolean sendFile(GCodeFile gcf) throws IOException, ParseException{
+		// TODO: Use an actual password
 		JSONObject obj = new JSONObject();
 	    obj.put("type", RequestType.FILE_CODE);
-	    obj.put("file", readFile(gcf.getFile()));
-	    obj.put("notes", gcf.getNotes());
+	    obj.put("file", JSONObject.escape(readFile(gcf.getFile())));
+	    obj.put("notes", JSONObject.escape(gcf.getNotes()));
 	    obj.put("id", gcf.getId());
-	    obj.put("name", gcf.getName());
+	    obj.put("name", JSONObject.escape(gcf.getName()));
 	    // TODO: Dynamically Add the following credentials
-	    obj.put("user", "testUser");
-	    obj.put("password", "password");
+	    obj.put("user", JSONObject.escape("testUser"));
+	    obj.put("password", JSONObject.escape("password"));
 	    String resp = sendCommand(obj.toJSONString());
 	    if(resp.length() < 1)
 	    	return false;
