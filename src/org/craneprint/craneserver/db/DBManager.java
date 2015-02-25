@@ -3,6 +3,7 @@ package org.craneprint.craneserver.db;
 import java.io.File;
 import java.net.UnknownHostException;
 import java.util.Date;
+import java.util.Set;
 
 import javax.servlet.ServletContext;
 
@@ -239,17 +240,10 @@ public class DBManager {
 		return toPrint;
 	}
 	
-	public Table getPrintsForUser(String user, MyPrintsTab mpt){
+	public Table getPrintsForUser(String user, MyPrintsTab mpt) {
 		// TODO: Check this for all printer collections <-- VERY IMPORTANT!!!
 		/**** Get database ****/
 		DB db = this.getDB();
-	 
-		/**** Get collection / table from the printer's collection ****/
-		DBCollection coll = getColl(/*TODO: REPLACE THIS SOON*/"printer" + 0);
-		
-		/**** Find and display ****/
-		BasicDBObject searchQuery = new BasicDBObject();
-		searchQuery.put("user", user);
 		
 		/**** Initialize the table ****/
 		Table t = new Table();
@@ -263,25 +257,35 @@ public class DBManager {
 		// Name   Status   Filament Required(g)   Filament Used(g)   Time Added   Time Printed
 		// ...    ...      ...                    ...                ...          ...
 		t.addContainerProperty("Name", String.class, null);
-		//t.addContainerProperty("Status", String.class, null);
+		// t.addContainerProperty("Status", String.class, null);
 		t.addContainerProperty("Status", VerticalLayout.class, null);
 		t.addContainerProperty("Filament Required(g)", Integer.class, null);
 		t.addContainerProperty("Filament Used(g)", Integer.class, null);
 		t.addContainerProperty("Printer", String.class, null);
 		t.addContainerProperty("Time Added", String.class, null);
 		t.addContainerProperty("Time Printed", String.class, null);
-		
-		DBCursor cursor = coll.find(searchQuery);
-		int row = 0;
-		while(cursor.hasNext()){
-			BasicDBObject n = (BasicDBObject)cursor.next();
-			t.addItem(this.getPrintRow(n, mpt), ++row);
+
+		/**** Get collection / table from the printer's collection ****/
+		Set<String> colls = db.getCollectionNames();
+		for (String s : colls) {
+			if(s.startsWith("printer")){
+				DBCollection coll = getColl(s);
+				/**** Find and display ****/
+				BasicDBObject searchQuery = new BasicDBObject();
+				searchQuery.put("user", user);
+				DBCursor cursor = coll.find(searchQuery);
+				int row = 0;
+				while (cursor.hasNext()) {
+					BasicDBObject n = (BasicDBObject) cursor.next();
+					t.addItem(this.makePrintRow(n, mpt), ++row);
+				}
+			}
 		}
-		
+
 		return t;
 	}
 	
-	private Object[] getPrintRow(BasicDBObject n, MyPrintsTab mpt){
+	private Object[] makePrintRow(BasicDBObject n, MyPrintsTab mpt){
 		// TODO: Replace with list of printers and search all collections etc...
 		int printerId = 0;
 		Object[] o = new Object[/*Number of Columns*/7];
