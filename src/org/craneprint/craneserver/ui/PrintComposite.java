@@ -158,7 +158,7 @@ public class PrintComposite extends CustomComponent implements Serializable{
 		leftVertical.setHeight("-1px");
 		leftVertical.setMargin(false);
 		
-		closeButton = new Button("Save Configuration");
+		closeButton = new Button("Save Notes");
 		closeButton.setImmediate(false);
 		closeButton.setWidth("100%");
 		closeButton.setHeight("-1px");
@@ -218,7 +218,6 @@ public class PrintComposite extends CustomComponent implements Serializable{
 	}
 	
 	public void addFileTab(GCodeFile g){
-		System.out.println("GCODE NAME: " + g.getName());
 		for(Entry<GCodeFile, String> e : fileHashMap.entrySet()){
 			if(e.getValue().equals(g.getName())/*&& e.getKey().isDeleted()*/)
 				return;
