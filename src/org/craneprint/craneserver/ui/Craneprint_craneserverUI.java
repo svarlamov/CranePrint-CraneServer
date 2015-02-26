@@ -24,6 +24,7 @@ import com.vaadin.ui.UI;
 public class Craneprint_craneserverUI extends UI implements DetachListener{
 	private ServletContext servletContext;
 	private PrintComposite pc;
+	private LoginWindow loginWindow;
 
 	@WebServlet(value = "/*", asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = Craneprint_craneserverUI.class)
@@ -32,14 +33,19 @@ public class Craneprint_craneserverUI extends UI implements DetachListener{
 
 	@Override
 	protected void init(VaadinRequest request) {
+		loginWindow = new LoginWindow(this);
+		this.addWindow(loginWindow);
+	}
+	
+	protected void showUI(){
 		servletContext = VaadinServlet.getCurrent().getServletContext();
 		Enumeration<String> en = servletContext.getAttributeNames();
 		while(en.hasMoreElements()){
 			System.out.println(en.nextElement());
 		}
 		pc = new PrintComposite(this);
-		
-		setContent(pc);
+		this.removeWindow(loginWindow);
+		this.setContent(pc);
 	}
 	
 	@Override
