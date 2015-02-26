@@ -9,7 +9,7 @@ public class GCodeFile {
 	private String user = "";
 	private String notes = "";
 	private long printId;
-	private boolean complete = false;
+	private boolean deleted = false;
 	
 	public GCodeFile(File f, String n, String ns, String u, long id){
 		file = f;
@@ -35,7 +35,8 @@ public class GCodeFile {
 		File meta = new File(file.getPath() + ".meta");
 		if(meta.exists())
 			success = meta.delete();
-		return file.delete();
+		deleted = success;
+		return success;
 	}
 	
 	public void setNotes(String ns){
@@ -56,6 +57,10 @@ public class GCodeFile {
 	
 	public String getUser(){
 		return user;
+	}
+	
+	public boolean isDeleted(){
+		return deleted;
 	}
 	
 	public static long calculateFilamentUsage(GCodeFile f){
