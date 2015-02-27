@@ -1,13 +1,10 @@
 package org.craneprint.craneserver.db;
 
+import java.util.Enumeration;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
-
-import org.craneprint.craneserver.queue.QueueManager;
-import org.craneprint.craneserver.ui.Craneprint_craneserverUI;
-
-import com.vaadin.ui.UI;
 
 /**
  * Application Lifecycle Listener implementation class ConnectDBListener

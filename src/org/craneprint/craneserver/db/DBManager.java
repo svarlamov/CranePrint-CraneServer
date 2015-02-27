@@ -77,7 +77,7 @@ public class DBManager {
 		document.put("name", f.getName());
 		document.put("notes", f.getNotes());
 		document.put("id", coll.getCount() + 1);
-		document.put("user", /*TODO: Get the Actual User*/"testUser");
+		document.put("user", f.getUser());
 		document.put("path", f.getFile().getPath());
 		document.put("filament_usage", GCodeFile.calculateFilamentUsage(f));
 		document.put("filament_used", 0);

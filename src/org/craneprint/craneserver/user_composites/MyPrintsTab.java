@@ -46,7 +46,7 @@ public class MyPrintsTab extends CustomComponent {
 		});
 		// TODO: Get the actual session user!!!
 		Craneprint_craneserverUI ui = (Craneprint_craneserverUI)UI.getCurrent();
-		printsTable = ui.getDBManager().getPrintsForUser("testUser", this);
+		printsTable = ui.getDBManager().getPrintsForUser(ui.getSessionUser().getUsername(), this);
 		printsTable.setSizeFull();
 		mainLayout.addComponent(refreshButton);
 		mainLayout.addComponent(printsTable);
@@ -56,7 +56,7 @@ public class MyPrintsTab extends CustomComponent {
 		mainLayout.removeComponent(printsTable);
 		// TODO: Get the actual session user!!!
 		Craneprint_craneserverUI ui = (Craneprint_craneserverUI)UI.getCurrent();
-		printsTable = ui.getDBManager().getPrintsForUser("testUser", this);
+		printsTable = ui.getDBManager().getPrintsForUser(ui.getSessionUser().getUsername(), this);
 		printsTable.setSizeFull();
 		mainLayout.addComponent(printsTable);
 	}

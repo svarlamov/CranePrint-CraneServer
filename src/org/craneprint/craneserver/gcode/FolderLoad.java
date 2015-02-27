@@ -9,7 +9,7 @@ public class FolderLoad {
 	private final File dir;
 	private HashMap<GCodeFile, String> ls = new HashMap<GCodeFile, String>();
 	
-	public FolderLoad(String d, String u){
+	public FolderLoad(String d){
 		dir = new File(d);
 		dir.mkdirs();
 	}

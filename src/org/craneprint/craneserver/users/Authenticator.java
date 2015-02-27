@@ -9,7 +9,10 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import com.vaadin.server.VaadinSession;
+
 public class Authenticator {
+	private static final long serialVersionUID = 1475947405579420523L;
 	private String username;
 	private boolean loggedIn = false;
 	private final String USER_AGENT = "Mozilla/5.0";
@@ -20,7 +23,7 @@ public class Authenticator {
 	
 	public boolean login(String u, String p) throws Exception{
 		loggedIn = true;
-		username = u;
+		username = u.toUpperCase();
 		String resp = sendPost(makeLoginJSON(username, p));
 		JSONObject json = (JSONObject)new JSONParser().parse(resp);
 		if(json.containsKey("Error"))
@@ -28,8 +31,7 @@ public class Authenticator {
 		else if(json.containsKey("AuthenticationResult") && (long)json.get("AuthenticationResult") == 0)
 			return true;
 		else if(json.containsKey("AuthenticationResult") && (long)json.get("AuthenticationResult") == 1)
-			return true;
-		System.out.println("RESP: " + resp);
+			return false;
 		return false;
 	}
 	

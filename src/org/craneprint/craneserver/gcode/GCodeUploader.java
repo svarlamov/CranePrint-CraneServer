@@ -9,8 +9,13 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.craneprint.craneserver.ui.Craneprint_craneserverUI;
+import org.craneprint.craneserver.users.User;
+
 import com.vaadin.server.Page;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload.FailedEvent;
 import com.vaadin.ui.Upload.FailedListener;
 import com.vaadin.ui.Upload.Receiver;
@@ -25,14 +30,14 @@ public class GCodeUploader implements Receiver, SucceededListener, FailedListene
 	private File file;
     private String fileName = "";
     private GCodeFile gcode = null;
-    // TODO: Actually get the session user!!!
-    private final String user = "testUser";
     // TODO: Think about this directory- does it really make sense, perhaps get one from the config file?
-    private final File folder = new File(System.getProperty("user.home") + File.separator + "CranePrint Uploads" + File.separator + user);
+    private File folder;
     private List _listeners = new ArrayList();
-    
+    private Craneprint_craneserverUI ui;
     
     public OutputStream receiveUpload(String filename, String mimeType) {
+    	ui = (Craneprint_craneserverUI)UI.getCurrent();
+    	folder = new File(System.getProperty("user.home") + File.separator + "CranePrint Uploads" + File.separator + ui.getSessionUser().getUsername());
     	fileName = filename;
     	// Check that the directory exists, and if not create all of the directories necessary
     	if(!folder.exists()){
@@ -64,7 +69,8 @@ public class GCodeUploader implements Receiver, SucceededListener, FailedListene
     public void uploadSucceeded(SucceededEvent event) {
         // Create a "GCodeFile" and add it to the accordion in the parent class
     	event.getComponent();
-    	GCodeFile gcf = new GCodeFile(file, fileName, "", user);
+    	ui = (Craneprint_craneserverUI)UI.getCurrent();
+    	GCodeFile gcf = new GCodeFile(file, fileName, "", ui.getSessionUser().getUsername());
     	CraneCodePacker c = new CraneCodePacker(gcf);
     	try {
 			c.pack();

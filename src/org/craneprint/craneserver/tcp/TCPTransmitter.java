@@ -34,6 +34,7 @@ public class TCPTransmitter {
 	private HandShake sendHandShake() throws IOException, ParseException {
 		JSONObject obj = new JSONObject();
 	    obj.put("type", RequestType.HAND_SHAKE_CODE);
+	    // TODO: Dynamically retreive printer password from config
 	    obj.put("password", "password");
 	    String resp = sendCommand(obj.toJSONString());
 	    return new HandShake(resp);
@@ -62,8 +63,8 @@ public class TCPTransmitter {
 	    obj.put("notes", JSONObject.escape(gcf.getNotes()));
 	    obj.put("id", gcf.getId());
 	    obj.put("name", JSONObject.escape(gcf.getName()));
-	    // TODO: Dynamically Add the following credentials
-	    obj.put("user", JSONObject.escape("testUser"));
+	    obj.put("user", JSONObject.escape(gcf.getUser()));
+	    // TODO: Get printer password dynamically from settings
 	    obj.put("password", JSONObject.escape("password"));
 	    String resp = sendCommand(obj.toJSONString());
 	    if(resp.length() < 1)
@@ -85,13 +86,11 @@ public class TCPTransmitter {
 	
 	public String sendCommand(String toSend) throws IOException {
 		String resp;
-		System.out.println("CHICK PORT: " + chickPort);
 		Socket clientSocket = new Socket(ip, chickPort);
 		DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
 		BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		outToServer.writeBytes(toSend + "\n");
 		resp = inFromServer.readLine();
-		System.out.println("FROM AGENT: " + resp);
 		clientSocket.close();
 		return resp;
 	}

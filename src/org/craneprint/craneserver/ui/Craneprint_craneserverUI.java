@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 
 import org.craneprint.craneserver.db.DBManager;
 import org.craneprint.craneserver.printers.PrintersManager;
+import org.craneprint.craneserver.users.User;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
@@ -14,7 +15,6 @@ import com.vaadin.server.ClientConnector.DetachListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Window;
 
 @SuppressWarnings("serial")
 @Theme("craneprint_craneserver")
@@ -22,6 +22,7 @@ public class Craneprint_craneserverUI extends UI implements DetachListener{
 	private ServletContext servletContext;
 	private PrintComposite pc;
 	private LoginWindow loginWindow;
+	private User user = null;
 
 	@WebServlet(value = "/*", asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = Craneprint_craneserverUI.class)
@@ -36,13 +37,17 @@ public class Craneprint_craneserverUI extends UI implements DetachListener{
 	
 	protected void showUI(){
 		servletContext = VaadinServlet.getCurrent().getServletContext();
-		Enumeration<String> en = servletContext.getAttributeNames();
-		while(en.hasMoreElements()){
-			System.out.println(en.nextElement());
-		}
 		pc = new PrintComposite(this);
 		this.removeWindow(loginWindow);
 		this.setContent(pc);
+	}
+	
+	public User getSessionUser(){
+		return user;
+	}
+	
+	protected void setSessionUser(User u){
+		user = u;
 	}
 	
 	@Override

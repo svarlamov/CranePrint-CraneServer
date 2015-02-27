@@ -1,8 +1,10 @@
 package org.craneprint.craneserver.ui;
 
 import org.craneprint.craneserver.users.Authenticator;
+import org.craneprint.craneserver.users.User;
 
 import com.vaadin.server.Page;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.LoginForm.LoginEvent;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Window;
@@ -32,14 +34,17 @@ public class LoginWindow extends Window implements LoginEventListener {
 	public void handleLoginEvent(LoginEvent event) {
 		boolean success = false;
 		try {
-			success = authObj.login(event.getLoginParameter("username"), event.getLoginParameter("password"));
+			success = authObj.login(event.getLoginParameter("username").toUpperCase(), event.getLoginParameter("password"));
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
-			new Notification("Login Failed", "Check that Your Username and Password are Correct", Notification.Type.ERROR_MESSAGE, true).show(Page.getCurrent());
+			new Notification("Login Failed", "There was an Issue Authenticating with the Server", Notification.Type.ERROR_MESSAGE, true).show(Page.getCurrent());
 			e.printStackTrace();
 		}
 		if(success){
+			User user = new User(event.getLoginParameter("username").toUpperCase(), true);
+			ui.setSessionUser(user);
 			ui.showUI();
-		}
+		} else
+			new Notification("Login Failed", "Check that Your Username and Password are Correct", Notification.Type.ERROR_MESSAGE, true).show(Page.getCurrent());
 	}
 }
