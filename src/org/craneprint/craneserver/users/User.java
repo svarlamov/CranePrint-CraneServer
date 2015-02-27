@@ -1,7 +1,7 @@
 package org.craneprint.craneserver.users;
 
 public class User {
-	private static final long serialVersionUID = 1475947405579420406L;
+	//private static final long serialVersionUID = 1475947405579420406L;
 	private String username;
 	private boolean loggedIn = false;
 	

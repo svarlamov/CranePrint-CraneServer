@@ -9,10 +9,12 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import java.io.Serializable;
+
 import com.vaadin.server.VaadinSession;
 
 public class Authenticator {
-	private static final long serialVersionUID = 1475947405579420523L;
+	//private static final long serialVersionUID = 1475947405579420523L;
 	private String username;
 	private boolean loggedIn = false;
 	private final String USER_AGENT = "Mozilla/5.0";
@@ -56,7 +58,6 @@ public class Authenticator {
 		    HttpPost request = new HttpPost("https://cranbrook.myschoolapp.com/api/SignIn");
 		    StringEntity params = new StringEntity(jsonParameters);
 		    request.addHeader("Content-Type", "application/json");
-		    //request.addHeader("Content-Length", new Long(params.getContentLength()).toString());
 		    request.addHeader("Accept","application/json");
 		    request.setEntity(params);
 		    

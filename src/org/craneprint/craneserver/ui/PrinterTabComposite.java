@@ -218,7 +218,7 @@ public class PrinterTabComposite extends CustomComponent {
 				rightTools.removeAllComponents();
 				// Set them up now
 				HashMap<String, String> toPut = hs.getTools();
-				Set<String> k = (Set<String>)toPut.keySet();
+				Set<String> k = toPut.keySet();
 				String[] keys = k.toArray(new String[k.size()]);
 				for(int i = 0; i < toPut.size(); i++){
 					Label lbl = new Label();
