@@ -1,6 +1,6 @@
 package org.craneprint.craneserver.ui;
 
-import java.util.Enumeration;
+import java.io.Serializable;
 
 import javax.servlet.ServletContext;
 import javax.servlet.annotation.WebServlet;
@@ -9,6 +9,7 @@ import org.craneprint.craneserver.db.DBManager;
 import org.craneprint.craneserver.printers.PrintersManager;
 import org.craneprint.craneserver.users.User;
 
+import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.ClientConnector.DetachListener;
@@ -16,9 +17,10 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
 
-@SuppressWarnings("serial")
 @Theme("craneprint_craneserver")
-public class Craneprint_craneserverUI extends UI implements DetachListener{
+@PreserveOnRefresh
+public class Craneprint_craneserverUI extends UI implements DetachListener, Serializable{
+	private static final long serialVersionUID = 8923663715888618200L;
 	private ServletContext servletContext;
 	private PrintComposite pc;
 	private LoginWindow loginWindow;
@@ -26,7 +28,8 @@ public class Craneprint_craneserverUI extends UI implements DetachListener{
 
 	@WebServlet(value = "/*", asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = Craneprint_craneserverUI.class)
-	public static class Servlet extends VaadinServlet { 
+	public static class Servlet extends VaadinServlet implements Serializable{
+		private static final long serialVersionUID = 7673663715888618137L; 
 	}
 
 	@Override

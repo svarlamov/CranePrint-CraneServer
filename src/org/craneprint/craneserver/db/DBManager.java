@@ -46,6 +46,7 @@ public class DBManager {
 	
 	private void connectToDB(){
 		try {
+			// TODO: Get DB host etc., from the settings
 			mongo = new MongoClient("localhost", port);
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
