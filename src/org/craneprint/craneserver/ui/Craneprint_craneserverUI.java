@@ -1,6 +1,5 @@
 package org.craneprint.craneserver.ui;
 
-import java.util.Collection;
 import java.util.Enumeration;
 
 import javax.servlet.ServletContext;
@@ -8,16 +7,14 @@ import javax.servlet.annotation.WebServlet;
 
 import org.craneprint.craneserver.db.DBManager;
 import org.craneprint.craneserver.printers.PrintersManager;
-import org.craneprint.craneserver.queue.QueueManager;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.ClientConnector.DetachListener;
-import com.vaadin.server.SessionDestroyEvent;
-import com.vaadin.server.SessionDestroyListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.Window;
 
 @SuppressWarnings("serial")
 @Theme("craneprint_craneserver")
