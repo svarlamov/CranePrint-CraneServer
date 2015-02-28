@@ -403,5 +403,20 @@ public class DBManager {
 		}
 		return perms;
 	}
+
+	public int getQueueSize(int printerId) {
+		ArrayList<String> perms = new ArrayList<String>();
+		/**** Get database ****/
+		DB db = this.getDB();
+
+		/**** Get collection / table from the users collection ****/
+		DBCollection coll = getColl("printer" + printerId);
+		
+		/**** Find and display ****/
+		DBObject searchQuery = buildStatusQuery();
+		
+		DBCursor cursor = coll.find(searchQuery);
+		return cursor.size();
+	}
 	
 }

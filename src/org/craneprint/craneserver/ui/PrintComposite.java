@@ -57,9 +57,9 @@ public class PrintComposite extends CustomComponent implements Serializable{
 	private SlicingTab slicingTab;
 	private HelpTab helpTab;
 	private MyPrintsTab myPrintsTab;
+	private Button logoutButton;
 	
 	Craneprint_craneserverUI ui = null;
-	
 	private GCodeUploader gcodeUploader = new GCodeUploader();
 	private Accordion fileAccordion;
 	private HashMap<GCodeFile, String> fileHashMap = new HashMap<GCodeFile, String>();
@@ -97,7 +97,7 @@ public class PrintComposite extends CustomComponent implements Serializable{
 		
 		printersManager = ui.getPrintersManager();
 		for(int i = 0; i < printersManager.getSize(); i++){
-			PrinterTabComposite ptb = new PrinterTabComposite();
+			PrinterTabComposite ptb = new PrinterTabComposite(ui);
 			printerAccordion.addTab(ptb, printersManager.getPrinter(i).getName());
 			ptb.fillComposite();
 		}
@@ -162,6 +162,18 @@ public class PrintComposite extends CustomComponent implements Serializable{
 		leftVertical.setWidth("98.0%");
 		leftVertical.setHeight("-1px");
 		leftVertical.setMargin(false);
+		
+		logoutButton = new Button("Logout");
+		logoutButton.setWidth("100%");
+		logoutButton.setHeight("-1px");
+		logoutButton.addClickListener(new ClickListener(){
+			public void buttonClick(ClickEvent event){
+				logout();
+				ui.removeUI();
+				ui.showLogin();
+			}
+		});
+		leftVertical.addComponent(logoutButton);
 		
 		closeButton = new Button("Save Notes");
 		closeButton.setImmediate(false);
@@ -294,5 +306,9 @@ public class PrintComposite extends CustomComponent implements Serializable{
 				break;
 			}
 		}
+	}
+	
+	private void logout(){
+		ui.getSessionUser().setLoggedOut();
 	}
 }

@@ -15,16 +15,15 @@ import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.ClientConnector.DetachListener;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 
 @Theme("craneprint_craneserver")
-@PreserveOnRefresh
 public class Craneprint_craneserverUI extends UI implements DetachListener, Serializable{
 	private static final long serialVersionUID = 8923663715888618200L;
 	private ServletContext servletContext;
 	private PrintComposite pc;
 	private LoginWindow loginWindow;
-	private User user = null;
 
 	@WebServlet(value = "/*", asyncSupported = true)
 	@VaadinServletConfiguration(productionMode = false, ui = Craneprint_craneserverUI.class)
@@ -34,8 +33,11 @@ public class Craneprint_craneserverUI extends UI implements DetachListener, Seri
 
 	@Override
 	protected void init(VaadinRequest request) {
-		loginWindow = new LoginWindow(this);
-		this.addWindow(loginWindow);
+		if(getSessionUser() != null && getSessionUser().isLoggedIn())
+			showUI();
+		else {
+			showLogin();
+		}
 	}
 	
 	protected void showUI(){
@@ -45,17 +47,26 @@ public class Craneprint_craneserverUI extends UI implements DetachListener, Seri
 		this.setContent(pc);
 	}
 	
+	protected void showLogin(){
+		loginWindow = new LoginWindow(this);
+		this.addWindow(loginWindow);
+	}
+	
+	protected void removeUI(){
+		this.setContent(null);
+	}
+	
 	public User getSessionUser(){
-		return user;
+		return VaadinSession.getCurrent().getAttribute(User.class);
 	}
 	
 	protected void setSessionUser(User u){
-		user = u;
+		VaadinSession.getCurrent().setAttribute(User.class, u);
 	}
 	
 	@Override
     public void detach(DetachEvent event) {
-		// TODO: Make sure that I still don't have to do anything on detachment
+		// TODO: Make sure that I still don't have to do anything else on detachment
 	}
 	
 	public PrintersManager getPrintersManager(){

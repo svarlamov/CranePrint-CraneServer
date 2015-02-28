@@ -41,6 +41,8 @@ public class PrinterTabComposite extends CustomComponent {
 	private HorizontalLayout toolsLayout;
 	private VerticalLayout leftTools;
 	private VerticalLayout rightTools;
+	
+	private Craneprint_craneserverUI ui;
 	//private HashMap<Label, Label> tools = new HashMap<Label, Label>();
 
 	/**
@@ -51,7 +53,8 @@ public class PrinterTabComposite extends CustomComponent {
 	 * visual editor.
 	 */
 	
-	public PrinterTabComposite(/*some data maybe*/) {
+	public PrinterTabComposite(Craneprint_craneserverUI u) {
+		ui = u;
 		buildMainLayout();
 		setCompositionRoot(mainLayout);
 		// TODO add user code here
@@ -101,7 +104,7 @@ public class PrinterTabComposite extends CustomComponent {
 		queueVLabel.setImmediate(false);
 		queueVLabel.setWidth("-1px");
 		queueVLabel.setHeight("-1px");
-		queueVLabel.setValue("");
+		queueVLabel.setValue(new Integer(ui.getDBManager().getQueueSize(/*TODO: Make this whole thing support multiple printers*/0)).toString());
 		// queueLayout
 		queueLayout = new HorizontalLayout();
 		queueLayout.setImmediate(false);
@@ -177,7 +180,7 @@ public class PrinterTabComposite extends CustomComponent {
 			hs = h.doHandShake();
 		} catch (IOException e1) {
 			stateVLabel.setValue("");
-			queueVLabel.setValue("");
+			queueVLabel.setValue(new Integer(ui.getDBManager().getQueueSize(/*TODO: Make this whole thing support multiple printers*/0)).toString());
 			notesArea.setValue("");
 			// Reset the tools stuff
 			leftTools.removeAllComponents();
@@ -193,7 +196,7 @@ public class PrinterTabComposite extends CustomComponent {
         		    .show(Page.getCurrent());
 		} catch (ParseException e1) {
 			stateVLabel.setValue("");
-			queueVLabel.setValue("");
+			queueVLabel.setValue(new Integer(ui.getDBManager().getQueueSize(/*TODO: Make this whole thing support multiple printers*/0)).toString());
 			notesArea.setValue("");
 			// Reset the tools stuff
 			leftTools.removeAllComponents();
@@ -211,7 +214,7 @@ public class PrinterTabComposite extends CustomComponent {
 			// Set the data in the UI
 			if(hs != null){
 				stateVLabel.setValue(PrinterStatus.getStringForInt(hs.getStatus()));
-				queueVLabel.setValue(hs.getQueueSize());
+				queueVLabel.setValue(new Integer(ui.getDBManager().getQueueSize(/*TODO: Make this whole thing support multiple printers*/0)).toString());
 				notesArea.setValue(hs.getNotes());
 				// Reset the tools stuff
 				leftTools.removeAllComponents();
