@@ -2,7 +2,9 @@ package org.craneprint.craneserver.db;
 
 import java.io.File;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Scanner;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
@@ -336,6 +338,70 @@ public class DBManager {
 		else
 			o[6] = new Date(p).toGMTString();
 		return o;
+	}
+	
+	public void registerUser(String username, String email){
+		/**** Get database ****/
+		DB db = this.getDB();
+	 
+		/**** Get collection / table from the users collection ****/
+		DBCollection coll = getColl("users");
+		
+		/**** Find and display ****/
+		BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put("username", username);
+		
+		DBCursor cursor = coll.find(searchQuery);
+		while (cursor.hasNext()) {
+			BasicDBObject n = (BasicDBObject)cursor.next();
+			if(n.getString("username").equals(username)){
+				return;
+			}
+		}
+		
+		// Add user, since the user does not already exist in the db
+		BasicDBObject document = new BasicDBObject();
+		document.put("username", username);
+		document.put("email", email);
+		document.put("permissions", "default");
+		coll.insert(document);
+	}
+	
+	public ArrayList<String> getPermsForUser(String username) {
+		ArrayList<String> perms = new ArrayList<String>();
+		/**** Get database ****/
+		DB db = this.getDB();
+
+		/**** Get collection / table from the users collection ****/
+		DBCollection coll = getColl("users");
+
+		/**** Find and display ****/
+		BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put("username", username);
+
+		DBCursor cursor = coll.find(searchQuery);
+		while (cursor.hasNext()) {
+			BasicDBObject n = (BasicDBObject) cursor.next();
+			if (n.getString("username").equals(username)) {
+				String ps = n.getString("permissions");
+				ps.replace(" ", "");
+				// Get scanner instance
+				Scanner scanner = new Scanner(ps);
+
+				// Set the delimiter used in file
+				scanner.useDelimiter(",");
+
+				// Get all tokens and store them in some data structure
+				// I am just printing them
+				while (scanner.hasNext()) {
+					perms.add(scanner.next());
+				}
+
+				// Do not forget to close the scanner
+				scanner.close();
+			}
+		}
+		return perms;
 	}
 	
 }

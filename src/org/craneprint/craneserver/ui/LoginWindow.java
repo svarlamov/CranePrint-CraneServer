@@ -42,6 +42,7 @@ public class LoginWindow extends Window implements LoginEventListener {
 		}
 		if(success){
 			User user = new User(event.getLoginParameter("username").toUpperCase(), true);
+			user.initPerms();
 			ui.setSessionUser(user);
 			ui.showUI();
 		} else

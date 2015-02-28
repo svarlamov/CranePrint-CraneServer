@@ -1,17 +1,24 @@
 package org.craneprint.craneserver.users;
 
 public class User {
-	//private static final long serialVersionUID = 1475947405579420406L;
 	private String username;
+	private Permissions permissions = null;
 	private boolean loggedIn = false;
-	
-	public User(String uname){
-		username = uname;
-	}
 	
 	public User(String uname, boolean isIn){
 		username = uname;
 		loggedIn = isIn;
+	}
+	
+	public void initPerms(){
+		permissions = new Permissions(username);
+	}
+	
+	public boolean hasPermission(String perm){
+		if(permissions.hasPermission(perm))
+			return true;
+		else
+			return false;
 	}
 	
 	public void setLoggedIn(){

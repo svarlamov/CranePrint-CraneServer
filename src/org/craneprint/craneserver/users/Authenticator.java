@@ -6,15 +6,13 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.craneprint.craneserver.db.DBManager;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import java.io.Serializable;
-
-import com.vaadin.server.VaadinSession;
+import com.vaadin.server.VaadinServlet;
 
 public class Authenticator {
-	//private static final long serialVersionUID = 1475947405579420523L;
 	private String username;
 	private boolean loggedIn = false;
 	private final String USER_AGENT = "Mozilla/5.0";
@@ -24,20 +22,23 @@ public class Authenticator {
 	}
 	
 	public boolean login(String u, String p) throws Exception{
-		loggedIn = true;
 		username = u.toUpperCase();
 		String resp = sendPost(makeLoginJSON(username, p));
 		JSONObject json = (JSONObject)new JSONParser().parse(resp);
 		if(json.containsKey("Error"))
 			return false;
-		else if(json.containsKey("AuthenticationResult") && (long)json.get("AuthenticationResult") == 0)
+		else if(json.containsKey("AuthenticationResult") && (long)json.get("AuthenticationResult") == 0){
+			loggedIn = true;
+			registerInDB(username, username.toLowerCase() + "@cranbrook.edu");
 			return true;
+		}
 		else if(json.containsKey("AuthenticationResult") && (long)json.get("AuthenticationResult") == 1)
 			return false;
 		return false;
 	}
 	
 	public boolean logout(){
+		loggedIn = false;
 		return true;
 	}
 	
@@ -80,5 +81,10 @@ public class Authenticator {
 		j.put("remember", false);
 		
 		return j.toJSONString();
+	}
+	
+	private void registerInDB(String un, String em){
+		DBManager db = (DBManager)VaadinServlet.getCurrent().getServletContext().getAttribute("org.craneprint.craneserver.db.dbManager");
+		db.registerUser(un, em);
 	}
 }
