@@ -57,8 +57,8 @@ public class GCodeUploader implements Receiver, SucceededListener, FailedListene
             // Open the file for writing.
             fos = new FileOutputStream(file);
         } catch (final java.io.FileNotFoundException e) {
-            new Notification("Could not open file",
-                             e.getMessage(),
+            new Notification("Could Not Open File",
+                             "Error Creating Stream on Server",
                              Notification.Type.TRAY_NOTIFICATION).show(Page.getCurrent());
             return null;
         }

@@ -5,6 +5,7 @@ import java.io.IOException;
 import org.craneprint.craneserver.gcode.GCodeFile;
 import org.craneprint.craneserver.tcp.RequestType;
 import org.craneprint.craneserver.tcp.TCPTransmitter;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
 public class PrinterConnection {
@@ -25,26 +26,14 @@ public class PrinterConnection {
 		return hs;
 	}
 	
-	public String sendCommand(){
-		return "MODIFY";
-	}
-	
 	public boolean sendFile(GCodeFile f) throws IOException, ParseException{
 		// TODO: Don't forget about setting up the notes variable...
 		return tcp.sendFile(f);
 	}
 	
 	public void sendQueueEmpty() throws IOException {
-		tcp.sendCommand("{\"type\":" + RequestType.QUEUE_EMPTY + "}\n");
-	}
-	
-	public int getPrinterStatus(){
-		// TODO: Do something?
-		return -1;
-	}
-	
-	public int getPrintProgress(){
-		// TODO: Do something?
-		return -1;
+		JSONObject j = new JSONObject();
+		j.put("type", RequestType.QUEUE_EMPTY);
+		tcp.sendCommand(j.toJSONString() + "\n");
 	}
 }
