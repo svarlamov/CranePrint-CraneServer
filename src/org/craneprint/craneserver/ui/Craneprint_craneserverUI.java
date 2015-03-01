@@ -24,6 +24,7 @@ public class Craneprint_craneserverUI extends UI implements DetachListener, Seri
 	private ServletContext servletContext;
 	private PrintComposite pc;
 	private AdminComposite ac;
+	private ClerkComposite cc;
 	private LoginWindow loginWindow;
 
 	@WebServlet(value = "/*", asyncSupported = true)
@@ -56,6 +57,16 @@ public class Craneprint_craneserverUI extends UI implements DetachListener, Seri
 		}
 		this.removeWindow(loginWindow);
 		this.setContent(ac);
+	}
+	
+	protected void showClerckUI(){
+		servletContext = VaadinServlet.getCurrent().getServletContext();
+		cc = new ClerkComposite(this);
+		for(Window w : this.getWindows()){
+			w.close();
+		}
+		this.removeWindow(loginWindow);
+		this.setContent(cc);
 	}
 	
 	protected void showLogin(){

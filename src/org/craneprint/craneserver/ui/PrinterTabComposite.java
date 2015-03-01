@@ -171,13 +171,16 @@ public class PrinterTabComposite extends CustomComponent {
 	
 	protected void fillComposite(){
 		Component c = getParent();
-    	while(!(c instanceof AdminComposite || c instanceof PrintComposite)){
+    	while(!(c instanceof AdminComposite || c instanceof PrintComposite || c instanceof ClerkComposite)){
     		c = c.getParent();
     	}
     	HandShake hs = null;
 		try {
 			if(c instanceof AdminComposite){
 	    		AdminComposite h = (AdminComposite)c;
+	    		hs = h.doHandShake();
+	    	} if(c instanceof ClerkComposite){
+	    		ClerkComposite h = (ClerkComposite)c;
 	    		hs = h.doHandShake();
 	    	} else{
 	    		PrintComposite h = (PrintComposite)c;

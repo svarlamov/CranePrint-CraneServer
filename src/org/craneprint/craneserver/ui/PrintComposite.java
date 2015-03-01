@@ -56,6 +56,7 @@ public class PrintComposite extends CustomComponent implements Serializable{
 	private MyPrintsTab myPrintsTab;
 	private Button logoutButton;
 	private Button adminButton;
+	private Button clerkButton;
 	
 	Craneprint_craneserverUI ui = null;
 	private GCodeUploader gcodeUploader = new GCodeUploader();
@@ -172,6 +173,16 @@ public class PrintComposite extends CustomComponent implements Serializable{
 			}
 		});
 		leftVertical.addComponent(logoutButton);
+		
+		clerkButton = new Button("Print Clerk View");
+		clerkButton.setWidth("100%");
+		clerkButton.setHeight("-1px");
+		clerkButton.addClickListener(new ClickListener(){
+			public void buttonClick(ClickEvent event){
+				ui.showClerckUI();
+			}
+		});
+		leftVertical.addComponent(clerkButton);
 		
 		adminButton = new Button("Admin View");
 		adminButton.setWidth("100%");
