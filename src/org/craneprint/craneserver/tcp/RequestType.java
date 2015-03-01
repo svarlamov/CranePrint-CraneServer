@@ -46,4 +46,6 @@ public class RequestType {
 	public static final int TURN_PRINTER_ON = 44;
 	public static final int SET_PRINTING_SPEED = 45;
 	public static final int SET_FAN_SPEED = 46;
+	public static final int CONNECT_TO_PRINTER = 47;
+	public static final int DISCONNECT_FROM_PRINTER = 48;
 }

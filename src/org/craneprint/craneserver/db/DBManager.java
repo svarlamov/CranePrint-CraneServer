@@ -201,9 +201,6 @@ public class DBManager {
 	}
 	
 	public GCodeFile getNextInQueue(int printerId){
-		/**** Get database ****/
-		DB db = this.getDB();
-	 
 		/**** Get collection / table from the printer's collection ****/
 		DBCollection coll = getColl("printer" + printerId);
 		
@@ -259,10 +256,6 @@ public class DBManager {
 	}
 	
 	public Table getPrintsForPrinter(int printerId, PrintsForPrinterTab pfpt) {
-		// TODO: Check this for all printer collections <-- VERY IMPORTANT!!!
-		/**** Get database ****/
-		DB db = this.getDB();
-		
 		/**** Initialize the table ****/
 		Table t = new Table();
 		// The code below has static columns, defined in the code... Possibly dynamic columns
@@ -349,7 +342,6 @@ public class DBManager {
 	}
 	
 	public Table getPrintsForUser(String user, MyPrintsTab mpt) {
-		// TODO: Check this for all printer collections <-- VERY IMPORTANT!!!
 		/**** Get database ****/
 		DB db = this.getDB();
 		
@@ -445,9 +437,6 @@ public class DBManager {
 	}
 	
 	public void registerUser(String username, String email){
-		/**** Get database ****/
-		DB db = this.getDB();
-	 
 		/**** Get collection / table from the users collection ****/
 		DBCollection coll = getColl("users");
 		
@@ -473,9 +462,6 @@ public class DBManager {
 	
 	public ArrayList<String> getPermsForUser(String username) {
 		ArrayList<String> perms = new ArrayList<String>();
-		/**** Get database ****/
-		DB db = this.getDB();
-
 		/**** Get collection / table from the users collection ****/
 		DBCollection coll = getColl("users");
 
@@ -509,10 +495,6 @@ public class DBManager {
 	}
 
 	public int getQueueSize(int printerId) {
-		ArrayList<String> perms = new ArrayList<String>();
-		/**** Get database ****/
-		DB db = this.getDB();
-
 		/**** Get collection / table from the users collection ****/
 		DBCollection coll = getColl("printer" + printerId);
 		
@@ -525,9 +507,6 @@ public class DBManager {
 	
 	public ArrayList<Object[]> getPrintQueue(int printerId){
 		ArrayList<Object[]> files = new ArrayList<Object[]>();
-		/**** Get database ****/
-		DB db = this.getDB();
-
 		/**** Get collection / table from the users collection ****/
 		DBCollection coll = getColl("printer" + printerId);
 		
@@ -539,6 +518,88 @@ public class DBManager {
 			// Make these into some kind of usable format and then use them in our code...
 		}
 		return files;
+	}
+	
+	public boolean addPrinter(String name){
+		/**** Get collection / table from the users collection ****/
+		DBCollection coll = getColl("printers");
+		/**** Find and display ****/
+		BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put("name", name);
+		
+		DBCursor cursor = coll.find(searchQuery);
+		while (cursor.hasNext()) {
+			BasicDBObject n = (BasicDBObject)cursor.next();
+			if(n.getString("name").equals(name)){
+				return false;
+			}
+		}
+		
+		// Add the printer, since it doesn't already exist in the DB
+		BasicDBObject document = new BasicDBObject();
+		document.put("name", name);
+		document.put("id", coll.find().size() + 1);
+		coll.insert(document);
+		return true;
+	}
+	
+	public void deletePrinter(int id){
+		/**** Get collection / table from the printers collection ****/
+		DBCollection coll = getColl("printers");
+		/**** Find and display ****/
+		BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put("id", id);
+		
+		DBCursor cursor = coll.find(searchQuery);
+		while (cursor.hasNext()) {
+			BasicDBObject n = (BasicDBObject)cursor.next();
+			coll.remove(n);
+		}
+	}
+	
+	public void setPrinterProperty(int id, String key, Object val){
+		/**** Get collection / table from the printers collection ****/
+		DBCollection coll = getColl("printers");
+		
+		BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put("id", id);
+		
+		BasicDBObject newDocument = new BasicDBObject();
+		newDocument.put(key, val);
+		
+		BasicDBObject updateObj = new BasicDBObject();
+		updateObj.put("$set", newDocument);
+		
+		coll.update(searchQuery, updateObj);
+	}
+	
+	public Object getPrinterProperty(int id, String key){
+		/**** Get collection / table from the printers collection ****/
+		DBCollection coll = getColl("printers");
+		
+		BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put("id", id);
+		DBCursor cursor = coll.find(searchQuery);
+		while (cursor.hasNext()) {
+			BasicDBObject n = (BasicDBObject)cursor.next();
+			return n.get(key);
+		}
+		return null;
+	}
+	
+	public BasicDBObject getPrinterDBObject(int id){
+		/**** Get collection / table from the printers collection ****/
+		DBCollection coll = getColl("printers");
+		/**** Find and display ****/
+		BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put("id", id);
+		
+		DBCursor cursor = coll.find(searchQuery);
+		while (cursor.hasNext()) {
+			BasicDBObject n = (BasicDBObject)cursor.next();
+			return n;
+		}
+		return null;
 	}
 	
 }

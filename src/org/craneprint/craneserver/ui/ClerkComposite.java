@@ -41,7 +41,7 @@ public class ClerkComposite extends CustomComponent {
 	Craneprint_craneserverUI ui = null;
 	private PrintersManager printersManager;
 	private Button closeButton;
-	private ArrayList<PrintsForPrinterTab> printsTabs = new ArrayList<PrintsForPrinterTab>();
+	private ArrayList<TabSheet> printerSheets = new ArrayList<TabSheet>();
 	
 	/**
 	 * The constructor should first build the main layout, set the
@@ -104,17 +104,19 @@ public class ClerkComposite extends CustomComponent {
 		detailsTabSheet.setHeight("100.0%");
 		printingHorizSplitPanel.addComponent(detailsTabSheet);
 		
-		adminHelpTab = new AdminHelpTab(ui);
+		for(int i = 0; i < ui.getDBManager().getAllPrinterCollectionNames().size(); i++){
+			TabSheet ts = new TabSheet();
+			ts.addTab(new PrintsForPrinterTab(i, ui), "Prints");
+			ts.addTab(new PrinterSettingsTab(i, ui), "Settings");
+			printerSheets.add(ts);
+		}
 		int i = 0;
-		for(String s : ui.getDBManager().getAllPrinterCollectionNames()){
-			printsTabs.add(new PrintsForPrinterTab(i, ui));
+		for(TabSheet sht : printerSheets){
+			detailsTabSheet.addTab(sht, ui.getPrintersManager().getPrinter(i).getName());
 			i++;
 		}
-		i = 0;
-		for(PrintsForPrinterTab pfpt : printsTabs){
-			detailsTabSheet.addTab(pfpt, "Prints for " + ui.getPrintersManager().getPrinter(i).getName());
-			i++;
-		}
+		
+		adminHelpTab = new AdminHelpTab(ui);
 		detailsTabSheet.addTab(adminHelpTab, "Help");
 		
 		return printingHorizSplitPanel;
