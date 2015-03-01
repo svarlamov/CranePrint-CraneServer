@@ -41,4 +41,9 @@ public class RequestType {
 	public static final int WAIT_FOR_BED = 39;
 	public static final int PLAY_BEEP_SOUND = 40;
 	public static final int SET_PID_PARAMETERS = 41;
+	public static final int CUSTOM_COMMAND = 42;
+	public static final int TURN_PRINTER_OFF = 43;
+	public static final int TURN_PRINTER_ON = 44;
+	public static final int SET_PRINTING_SPEED = 45;
+	public static final int SET_FAN_SPEED = 46;
 }

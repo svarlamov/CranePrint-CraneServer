@@ -44,7 +44,7 @@ public class LoginWindow extends Window implements LoginEventListener {
 			User user = new User(event.getLoginParameter("username").toUpperCase(), true);
 			user.initPerms();
 			ui.setSessionUser(user);
-			ui.showUI();
+			ui.showPrintingUI();
 		} else
 			new Notification("Login Failed", "Check that Your Username and Password are Correct", Notification.Type.ERROR_MESSAGE, true).show(Page.getCurrent());
 	}

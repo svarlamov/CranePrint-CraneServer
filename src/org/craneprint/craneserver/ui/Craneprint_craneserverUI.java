@@ -9,7 +9,6 @@ import org.craneprint.craneserver.db.DBManager;
 import org.craneprint.craneserver.printers.PrintersManager;
 import org.craneprint.craneserver.users.User;
 
-import com.vaadin.annotations.PreserveOnRefresh;
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.ClientConnector.DetachListener;
@@ -17,12 +16,14 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinServlet;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.Window;
 
 @Theme("craneprint_craneserver")
 public class Craneprint_craneserverUI extends UI implements DetachListener, Serializable{
 	private static final long serialVersionUID = 8923663715888618200L;
 	private ServletContext servletContext;
 	private PrintComposite pc;
+	private AdminComposite ac;
 	private LoginWindow loginWindow;
 
 	@WebServlet(value = "/*", asyncSupported = true)
@@ -34,17 +35,27 @@ public class Craneprint_craneserverUI extends UI implements DetachListener, Seri
 	@Override
 	protected void init(VaadinRequest request) {
 		if(getSessionUser() != null && getSessionUser().isLoggedIn())
-			showUI();
+			showPrintingUI();
 		else {
 			showLogin();
 		}
 	}
 	
-	protected void showUI(){
+	protected void showPrintingUI(){
 		servletContext = VaadinServlet.getCurrent().getServletContext();
 		pc = new PrintComposite(this);
 		this.removeWindow(loginWindow);
 		this.setContent(pc);
+	}
+	
+	protected void showAdminUI(){
+		servletContext = VaadinServlet.getCurrent().getServletContext();
+		ac = new AdminComposite(this);
+		for(Window w : this.getWindows()){
+			w.close();
+		}
+		this.removeWindow(loginWindow);
+		this.setContent(ac);
 	}
 	
 	protected void showLogin(){

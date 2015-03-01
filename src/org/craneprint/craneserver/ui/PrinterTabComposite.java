@@ -171,13 +171,18 @@ public class PrinterTabComposite extends CustomComponent {
 	
 	protected void fillComposite(){
 		Component c = getParent();
-    	while(!(c instanceof PrintComposite)){
+    	while(!(c instanceof AdminComposite || c instanceof PrintComposite)){
     		c = c.getParent();
     	}
-    	PrintComposite h = (PrintComposite)c;
     	HandShake hs = null;
 		try {
-			hs = h.doHandShake();
+			if(c instanceof AdminComposite){
+	    		AdminComposite h = (AdminComposite)c;
+	    		hs = h.doHandShake();
+	    	} else{
+	    		PrintComposite h = (PrintComposite)c;
+	    		hs = h.doHandShake();
+	    	}
 		} catch (IOException e1) {
 			stateVLabel.setValue("");
 			queueVLabel.setValue(new Integer(ui.getDBManager().getQueueSize(/*TODO: Make this whole thing support multiple printers*/0)).toString());

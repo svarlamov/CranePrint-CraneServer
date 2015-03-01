@@ -12,7 +12,8 @@ import javax.servlet.ServletContext;
 import org.craneprint.craneserver.gcode.GCodeFile;
 import org.craneprint.craneserver.gcode.PrintStatus;
 import org.craneprint.craneserver.printers.PrintersManager;
-import org.craneprint.craneserver.user_composites.MyPrintsTab;
+import org.craneprint.craneserver.ui.MyPrintsTab;
+import org.craneprint.craneserver.ui.PrintsForPrinterTab;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
@@ -243,6 +244,110 @@ public class DBManager {
 		return toPrint;
 	}
 	
+	public ArrayList<String> getAllPrinterCollectionNames(){
+		/**** Get database ****/
+		DB db = this.getDB();
+		
+		ArrayList<String> names = new ArrayList<String>();
+		Set<String> colls = db.getCollectionNames();
+		for (String s : colls) {
+			if(s.startsWith("printer")){
+				names.add(s);
+			}
+		}
+		return names;
+	}
+	
+	public Table getPrintsForPrinter(int printerId, PrintsForPrinterTab pfpt) {
+		// TODO: Check this for all printer collections <-- VERY IMPORTANT!!!
+		/**** Get database ****/
+		DB db = this.getDB();
+		
+		/**** Initialize the table ****/
+		Table t = new Table();
+		// The code below has static columns, defined in the code... Possibly dynamic columns
+		// might make sense for easier maintenance later on, but the performance hit might
+		// be pretty massive given all of the loops and stuff to be iterated to dynamically
+		// create all of the rows. Plus, it doesn't seem, at least now, that this will
+		// be A) User configurable or B) Updated very frequently
+		
+		// Create a table such that
+		// Name   Status   Filament Required(g)   Filament Used(g)   Owner   Time Added   Time Printed
+		// ...    ...      ...                    ...                ...     ...          ...
+		t.addContainerProperty("Name", String.class, null);
+		// t.addContainerProperty("Status", String.class, null);
+		t.addContainerProperty("Status", VerticalLayout.class, null);
+		t.addContainerProperty("Filament Required(g)", Integer.class, null);
+		t.addContainerProperty("Filament Used(g)", Integer.class, null);
+		t.addContainerProperty("Printer", String.class, null);
+		t.addContainerProperty("Owner", String.class, null);
+		t.addContainerProperty("Time Added", String.class, null);
+		t.addContainerProperty("Time Printed", String.class, null);
+
+		/**** Get collection / table from the printer's collection ****/
+		DBCollection coll = getColl("printer" + printerId);
+		/**** Find and display ****/
+		DBCursor cursor = coll.find();
+		int row = 0;
+		while (cursor.hasNext()) {
+			BasicDBObject n = (BasicDBObject) cursor.next();
+			t.addItem(this.makePrintRow(n, pfpt, printerId), ++row);
+		}
+
+		return t;
+	}
+	
+	private Object[] makePrintRow(BasicDBObject n, PrintsForPrinterTab pfpt, int printerId){
+		Object[] o = new Object[/*Number of Columns*/8];
+		o[0] = n.getString("name");
+		// TODO: Add a cancel button here!
+		if(n.getInt("print_status") == PrintStatus.IN_QUE){
+			VerticalLayout v = new VerticalLayout();
+			Button b = new Button();
+			b.setCaption("Cancel");
+			b.addClickListener(new ClickListener(){
+			    public void buttonClick(ClickEvent event){
+			        boolean b = cancelPrint(n, printerId);
+			        if(b) {
+			        	new Notification("Print Cancelled",
+			        		    "Print Cancelled",
+			        		    Notification.TYPE_TRAY_NOTIFICATION, true)
+			        		    .show(Page.getCurrent());
+			        	pfpt.refreshTable();
+			        } else {
+			        	new Notification("Error",
+			        		    "Print Can Not Be Cancelled",
+			        		    Notification.TYPE_TRAY_NOTIFICATION, true)
+			        		    .show(Page.getCurrent());
+			        	pfpt.refreshTable();
+			        }
+			    }
+			});
+			v.addComponent(b);
+			o[1] = v;
+		} else {
+			Label l = new Label();
+			l.setValue(PrintStatus.resolveToString(n.getInt("print_status")));
+			VerticalLayout vl = new VerticalLayout();
+			vl.addComponent(l);
+			o[1] = vl;
+		}
+		o[2] = n.getInt("filament_usage");
+		o[3] = n.getInt("filament_used");
+		o[4] = n.getString("user");
+		PrintersManager pm = (PrintersManager)context.getAttribute("org.craneprint.craneserver.printers.printersManager");
+		o[5] = pm.getPrinter(printerId).getName();
+		o[6] = new Date(n.getLong("added_time")).toGMTString();
+		long p = n.getLong("printed_time");
+		if(p == -1)
+			o[7] = "Not Yet Complete";
+		else if(p == -2)
+			o[7] = "Cancelled";
+		else
+			o[7] = new Date(p).toGMTString();
+		return o;
+	}
+	
 	public Table getPrintsForUser(String user, MyPrintsTab mpt) {
 		// TODO: Check this for all printer collections <-- VERY IMPORTANT!!!
 		/**** Get database ****/
@@ -289,7 +394,6 @@ public class DBManager {
 	}
 	
 	private Object[] makePrintRow(BasicDBObject n, MyPrintsTab mpt){
-		// TODO: Replace with list of printers and search all collections etc...
 		int printerId = 0;
 		Object[] o = new Object[/*Number of Columns*/7];
 		o[0] = n.getString("name");
@@ -417,6 +521,24 @@ public class DBManager {
 		
 		DBCursor cursor = coll.find(searchQuery);
 		return cursor.size();
+	}
+	
+	public ArrayList<Object[]> getPrintQueue(int printerId){
+		ArrayList<Object[]> files = new ArrayList<Object[]>();
+		/**** Get database ****/
+		DB db = this.getDB();
+
+		/**** Get collection / table from the users collection ****/
+		DBCollection coll = getColl("printer" + printerId);
+		
+		/**** Find and display ****/
+		DBObject searchQuery = buildStatusQuery();
+		
+		DBCursor cursor = coll.find(searchQuery);
+		while(cursor.hasNext()){
+			// Make these into some kind of usable format and then use them in our code...
+		}
+		return files;
 	}
 	
 }

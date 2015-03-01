@@ -13,11 +13,8 @@ import org.craneprint.craneserver.gcode.GCodeFile;
 import org.craneprint.craneserver.gcode.GCodeUploadedEvent;
 import org.craneprint.craneserver.gcode.GCodeUploadedListener;
 import org.craneprint.craneserver.gcode.GCodeUploader;
-import org.craneprint.craneserver.help.HelpTab;
 import org.craneprint.craneserver.printers.HandShake;
 import org.craneprint.craneserver.printers.PrintersManager;
-import org.craneprint.craneserver.slicing.SlicingTab;
-import org.craneprint.craneserver.user_composites.MyPrintsTab;
 import org.craneprint.craneserver.users.User;
 import org.json.simple.parser.ParseException;
 
@@ -58,6 +55,7 @@ public class PrintComposite extends CustomComponent implements Serializable{
 	private HelpTab helpTab;
 	private MyPrintsTab myPrintsTab;
 	private Button logoutButton;
+	private Button adminButton;
 	
 	Craneprint_craneserverUI ui = null;
 	private GCodeUploader gcodeUploader = new GCodeUploader();
@@ -144,9 +142,9 @@ public class PrintComposite extends CustomComponent implements Serializable{
 		detailsTabSheet.setHeight("100.0%");
 		printingHorizSplitPanel.addComponent(detailsTabSheet);
 		
-		slicingTab = new SlicingTab();
-		helpTab = new HelpTab();
-		myPrintsTab = new MyPrintsTab();
+		slicingTab = new SlicingTab(ui);
+		helpTab = new HelpTab(ui);
+		myPrintsTab = new MyPrintsTab(ui);
 		detailsTabSheet.addTab(slicingTab, "Slicing");
 		detailsTabSheet.addTab(myPrintsTab, "My Prints");
 		detailsTabSheet.addTab(helpTab, "Help");
@@ -174,6 +172,16 @@ public class PrintComposite extends CustomComponent implements Serializable{
 			}
 		});
 		leftVertical.addComponent(logoutButton);
+		
+		adminButton = new Button("Admin View");
+		adminButton.setWidth("100%");
+		adminButton.setHeight("-1px");
+		adminButton.addClickListener(new ClickListener(){
+			public void buttonClick(ClickEvent event){
+				ui.showAdminUI();
+			}
+		});
+		leftVertical.addComponent(adminButton);
 		
 		closeButton = new Button("Save Notes");
 		closeButton.setImmediate(false);
