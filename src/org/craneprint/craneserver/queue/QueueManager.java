@@ -25,7 +25,6 @@ public class QueueManager {
 		try {
 			hs = this.getPrintersManager().doHandShake(printerId);
 		} catch (IOException | ParseException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		if(this.getDBManager().isQueueEmpty(printerId) && hs != null && hs.getStatus() != PrinterStatus.FAILED_TO_CONNECT_CODE && hs.getStatus() != PrinterStatus.UNKNOWN_ERROR_CODE && hs.getStatus() != PrinterStatus.NO_DATA_CODE && hs.getStatus() != PrinterStatus.FAILED_TO_AUTHENTICATE_CODE){
