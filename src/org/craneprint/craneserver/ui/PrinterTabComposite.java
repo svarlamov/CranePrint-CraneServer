@@ -43,7 +43,7 @@ public class PrinterTabComposite extends CustomComponent {
 	private VerticalLayout rightTools;
 	
 	private Craneprint_craneserverUI ui;
-	//private HashMap<Label, Label> tools = new HashMap<Label, Label>();
+	private int printerId;
 
 	/**
 	 * The constructor should first build the main layout, set the
@@ -53,7 +53,8 @@ public class PrinterTabComposite extends CustomComponent {
 	 * visual editor.
 	 */
 	
-	public PrinterTabComposite(Craneprint_craneserverUI u) {
+	public PrinterTabComposite(int pid, Craneprint_craneserverUI u) {
+		printerId = pid;
 		ui = u;
 		buildMainLayout();
 		setCompositionRoot(mainLayout);
@@ -104,7 +105,7 @@ public class PrinterTabComposite extends CustomComponent {
 		queueVLabel.setImmediate(false);
 		queueVLabel.setWidth("-1px");
 		queueVLabel.setHeight("-1px");
-		queueVLabel.setValue(new Integer(ui.getDBManager().getQueueSize(/*TODO: Make this whole thing support multiple printers*/0)).toString());
+		queueVLabel.setValue(new Integer(ui.getDBManager().getQueueSize(printerId)).toString());
 		// queueLayout
 		queueLayout = new HorizontalLayout();
 		queueLayout.setImmediate(false);
@@ -131,7 +132,7 @@ public class PrinterTabComposite extends CustomComponent {
 		toolsLayout.addComponent(leftTools);
 		toolsLayout.addComponent(rightTools);
 		mainLayout.addComponent(toolsLayout);
-		// Intialize a preliminary message about the tools
+		// Initialize a preliminary message about the tools
 		Label l = new Label();
 		l.setValue("");
 		leftTools.addComponent(new Label("Tool0: "));
@@ -179,7 +180,7 @@ public class PrinterTabComposite extends CustomComponent {
 			if(c instanceof AdminComposite){
 	    		AdminComposite h = (AdminComposite)c;
 	    		hs = h.doHandShake();
-	    	} if(c instanceof ClerkComposite){
+	    	} else if(c instanceof ClerkComposite){
 	    		ClerkComposite h = (ClerkComposite)c;
 	    		hs = h.doHandShake();
 	    	} else{
@@ -188,7 +189,7 @@ public class PrinterTabComposite extends CustomComponent {
 	    	}
 		} catch (IOException e1) {
 			stateVLabel.setValue("");
-			queueVLabel.setValue(new Integer(ui.getDBManager().getQueueSize(/*TODO: Make this whole thing support multiple printers*/0)).toString());
+			queueVLabel.setValue(new Integer(ui.getDBManager().getQueueSize(printerId)).toString());
 			notesArea.setValue("");
 			// Reset the tools stuff
 			leftTools.removeAllComponents();
@@ -204,7 +205,7 @@ public class PrinterTabComposite extends CustomComponent {
         		    .show(Page.getCurrent());
 		} catch (ParseException e1) {
 			stateVLabel.setValue("");
-			queueVLabel.setValue(new Integer(ui.getDBManager().getQueueSize(/*TODO: Make this whole thing support multiple printers*/0)).toString());
+			queueVLabel.setValue(new Integer(ui.getDBManager().getQueueSize(printerId)).toString());
 			notesArea.setValue("");
 			// Reset the tools stuff
 			leftTools.removeAllComponents();
@@ -222,7 +223,7 @@ public class PrinterTabComposite extends CustomComponent {
 			// Set the data in the UI
 			if(hs != null){
 				stateVLabel.setValue(PrinterStatus.getStringForInt(hs.getStatus()));
-				queueVLabel.setValue(new Integer(ui.getDBManager().getQueueSize(/*TODO: Make this whole thing support multiple printers*/0)).toString());
+				queueVLabel.setValue(new Integer(ui.getDBManager().getQueueSize(printerId)).toString());
 				notesArea.setValue(hs.getNotes());
 				// Reset the tools stuff
 				leftTools.removeAllComponents();

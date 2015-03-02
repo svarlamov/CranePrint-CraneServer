@@ -61,7 +61,7 @@ public class QueueManager {
 		}
 		else {
 			try {
-				// Tell the printer to keep waiting, becuase there is nothing in the queue
+				// Tell the printer to keep waiting, because there is nothing in the queue
 				this.getPrintersManager().getPrinter(printerId).getPrinterConnection().sendQueueEmpty();
 			} catch (IOException e) {
 				e.printStackTrace();

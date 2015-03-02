@@ -377,7 +377,7 @@ public class DBManager {
 				int row = 0;
 				while (cursor.hasNext()) {
 					BasicDBObject n = (BasicDBObject) cursor.next();
-					t.addItem(this.makePrintRow(n, mpt), ++row);
+					t.addItem(this.makePrintRow(n, new Integer(s.replace("printer", "")), mpt), ++row);
 				}
 			}
 		}
@@ -385,8 +385,7 @@ public class DBManager {
 		return t;
 	}
 	
-	private Object[] makePrintRow(BasicDBObject n, MyPrintsTab mpt){
-		int printerId = 0;
+	private Object[] makePrintRow(BasicDBObject n, int printerId, MyPrintsTab mpt){
 		Object[] o = new Object[/*Number of Columns*/7];
 		o[0] = n.getString("name");
 		// TODO: Add a cancel button here!
@@ -520,7 +519,7 @@ public class DBManager {
 		return files;
 	}
 	
-	public boolean addPrinter(String name){
+	public boolean addPrinter(String name, String password, String ip, int port){
 		/**** Get collection / table from the users collection ****/
 		DBCollection coll = getColl("printers");
 		/**** Find and display ****/
@@ -537,6 +536,9 @@ public class DBManager {
 		
 		// Add the printer, since it doesn't already exist in the DB
 		BasicDBObject document = new BasicDBObject();
+		document.put("password", password);
+		document.put("ip", ip);
+		document.put("port", port);
 		document.put("name", name);
 		document.put("id", coll.find().size() + 1);
 		coll.insert(document);
@@ -587,6 +589,20 @@ public class DBManager {
 		return null;
 	}
 	
+	public int getPrinterId(String name){
+		/**** Get collection / table from the printers collection ****/
+		DBCollection coll = getColl("printers");
+		
+		BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put("name", name);
+		DBCursor cursor = coll.find(searchQuery);
+		while (cursor.hasNext()) {
+			BasicDBObject n = (BasicDBObject)cursor.next();
+			return n.getInt("id");
+		}
+		return -1;
+	}
+	
 	public BasicDBObject getPrinterDBObject(int id){
 		/**** Get collection / table from the printers collection ****/
 		DBCollection coll = getColl("printers");
@@ -600,6 +616,17 @@ public class DBManager {
 			return n;
 		}
 		return null;
+	}
+	
+	public ArrayList<BasicDBObject> getAllPrinters(){
+		ArrayList<BasicDBObject> printers = new ArrayList<BasicDBObject>();
+		/**** Get collection / table from the printers collection ****/
+		DBCollection coll = getColl("printers");
+		DBCursor cursor = coll.find();
+		while (cursor.hasNext()) {
+			printers.add((BasicDBObject)cursor.next());
+		}
+		return printers;
 	}
 	
 }

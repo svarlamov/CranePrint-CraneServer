@@ -54,7 +54,6 @@ public class TCPListenerThread implements Runnable {
 						this.getQueueManager().sendNextInQueue((int)(long)jo.get("printerId"));
 					}
 					outToAgent.writeBytes("{\"resp\":\"success\"}\n");
-					//outToAgent.close();
 				}
 			}
 		} catch(IOException e){

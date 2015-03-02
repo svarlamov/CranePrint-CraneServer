@@ -77,6 +77,7 @@ public class PrintComposite extends CustomComponent implements Serializable{
 	public PrintComposite(Craneprint_craneserverUI u) {
 		ui = u;
 		user = ui.getSessionUser();
+		//ui.getDBManager().setPrinterProperty(1, "id", 0);
 		
 		folder = new File(System.getProperty("user.home") + File.separator + "CranePrint Uploads" + File.separator + user.getUsername());
 		
@@ -96,7 +97,7 @@ public class PrintComposite extends CustomComponent implements Serializable{
 		
 		printersManager = ui.getPrintersManager();
 		for(int i = 0; i < printersManager.getSize(); i++){
-			PrinterTabComposite ptb = new PrinterTabComposite(ui);
+			PrinterTabComposite ptb = new PrinterTabComposite(printersManager.getPrinter(i).getId(), ui);
 			printerAccordion.addTab(ptb, printersManager.getPrinter(i).getName());
 			ptb.fillComposite();
 		}

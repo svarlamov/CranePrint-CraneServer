@@ -1,5 +1,7 @@
 package org.craneprint.craneserver.printers;
 
+import com.mongodb.BasicDBObject;
+
 
 public class Printer {
 	private String name = "";
@@ -8,19 +10,18 @@ public class Printer {
 	private int status = PrinterStatus.NO_DATA_CODE;
 	private String password = "";
 	private PrinterConnection connection = null;
-	private int id = 0;
+	private int id;
 	
 	// TODO: This class shall contain and manage all of the credentials of the printer and the status of it ie. printing, ready, waiting etc.
-	public Printer(String n, String pw, String ip, int p){
-		name = n;
-		ipAddress = ip;
-		password = pw;
-		// TODO: These defaults are wrong
-		if(p != 6880/*default port*/)
-			port = p;
+	public Printer(BasicDBObject obj){
+		id = obj.getInt("id");
+		name = obj.getString("name");
+		ipAddress = obj.getString("ip");
+		password = obj.getString("password");
+		port = obj.getInt("port");
 		// Create a new connection, keep in mind just because this class has been instantiated
 		// and variables initialized the printer has nothing sent to it yet, nor an actual connection initialized
-		connection = new PrinterConnection(password, ip, port);
+		connection = new PrinterConnection(password, ipAddress, port);
 	}
 	
 	public PrinterConnection getPrinterConnection(){

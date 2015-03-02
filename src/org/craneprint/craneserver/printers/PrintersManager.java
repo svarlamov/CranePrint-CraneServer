@@ -2,19 +2,16 @@ package org.craneprint.craneserver.printers;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import javax.servlet.ServletContext;
 
+import org.craneprint.craneserver.db.DBManager;
 import org.craneprint.craneserver.gcode.GCodeFile;
 import org.craneprint.craneserver.queue.QueueManager;
-import org.craneprint.craneserver.ui.Craneprint_craneserverUI;
-import org.craneprint.craneserver.ui.GetServerSettings;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
-import com.vaadin.ui.UI;
+import com.mongodb.BasicDBObject;
 
 public class PrintersManager {
 	// A class to manage all printers that we can connect to. This class will be owned by the PrinterComposite
@@ -26,14 +23,11 @@ public class PrintersManager {
 	}
 
 	public ArrayList<Printer> loadAll(){
-		// TODO: Get all of the printers outlined in the settings, add them to "printers and then return "printers"
-		// Get all printers from the settings file and them add them into "printers"
-		JSONArray a = GetServerSettings.getArray("printers");
-		Iterator i = a.iterator();
+		DBManager db = (DBManager)context.getAttribute("org.craneprint.craneserver.db.dbManager");
+		ArrayList<BasicDBObject> p = db.getAllPrinters();
 		// take each value from the json array separately
-		while (i.hasNext()) {
-			JSONObject innerObj = (JSONObject) i.next();
-			printers.add(new Printer((String)innerObj.get("name"), (String)innerObj.get("password"), (String)innerObj.get("ip"), Integer.parseInt((String)innerObj.get("port"))));
+		for(BasicDBObject obj : p){
+			printers.add(new Printer(obj));
 		}
 		return printers;
 	}
@@ -56,6 +50,14 @@ public class PrintersManager {
 	public Printer getPrinter(int id){
 		for(Printer p : printers){
 			if(p.getId() == id)
+				return p;
+		}
+		return null;
+	}
+	
+	public Printer getPrinter(String name){
+		for(Printer p : printers){
+			if(p.getName() == name)
 				return p;
 		}
 		return null;

@@ -57,7 +57,7 @@ public class ClerkComposite extends CustomComponent {
 		
 		printersManager = ui.getPrintersManager();
 		for(int i = 0; i < printersManager.getSize(); i++){
-			PrinterTabComposite ptb = new PrinterTabComposite(ui);
+			PrinterTabComposite ptb = new PrinterTabComposite(printersManager.getPrinter(i).getId(), ui);
 			printerAccordion.addTab(ptb, printersManager.getPrinter(i).getName());
 			ptb.fillComposite();
 		}
@@ -104,7 +104,7 @@ public class ClerkComposite extends CustomComponent {
 		detailsTabSheet.setHeight("100.0%");
 		printingHorizSplitPanel.addComponent(detailsTabSheet);
 		
-		for(int i = 0; i < ui.getDBManager().getAllPrinterCollectionNames().size(); i++){
+		for(int i = 0; i < ui.getDBManager().getAllPrinters().size(); i++){
 			TabSheet ts = new TabSheet();
 			ts.addTab(new PrintsForPrinterTab(i, ui), "Prints");
 			ts.addTab(new PrinterSettingsTab(i, ui), "Settings");
@@ -112,7 +112,7 @@ public class ClerkComposite extends CustomComponent {
 		}
 		int i = 0;
 		for(TabSheet sht : printerSheets){
-			detailsTabSheet.addTab(sht, ui.getPrintersManager().getPrinter(i).getName());
+			detailsTabSheet.addTab(sht, ui.getDBManager().getAllPrinters().get(i).getString("name"));
 			i++;
 		}
 		

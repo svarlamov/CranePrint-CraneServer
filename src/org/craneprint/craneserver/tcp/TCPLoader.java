@@ -36,8 +36,7 @@ public class TCPLoader implements ServletContextListener {
 	/**
      * @see ServletContextListener#contextInitialized(ServletContextEvent)
      */
-    public void contextInitialized(ServletContextEvent arg0)  { 
-         // TODO Implement for multiple printers
+    public void contextInitialized(ServletContextEvent arg0)  {
     	tcp = new TCPListenerThread(arg0.getServletContext(), cranePort);
     	thread = new Thread(tcp);
     	thread.start();
