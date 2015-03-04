@@ -272,8 +272,8 @@ public class DBManager {
 		t.addContainerProperty("Status", VerticalLayout.class, null);
 		t.addContainerProperty("Filament Required(g)", Integer.class, null);
 		t.addContainerProperty("Filament Used(g)", Integer.class, null);
-		t.addContainerProperty("Printer", String.class, null);
 		t.addContainerProperty("Owner", String.class, null);
+		t.addContainerProperty("Printer", String.class, null);
 		t.addContainerProperty("Time Added", String.class, null);
 		t.addContainerProperty("Time Printed", String.class, null);
 
@@ -368,7 +368,7 @@ public class DBManager {
 		/**** Get collection / table from the printer's collection ****/
 		Set<String> colls = db.getCollectionNames();
 		for (String s : colls) {
-			if(s.startsWith("printer")){
+			if(s.startsWith("printer") && !s.equals("printers")){
 				DBCollection coll = getColl(s);
 				/**** Find and display ****/
 				BasicDBObject searchQuery = new BasicDBObject();
@@ -519,7 +519,7 @@ public class DBManager {
 		return files;
 	}
 	
-	public boolean addPrinter(String name, String password, String ip, int port){
+	public int addPrinter(String name, String password, String ip, int port){
 		/**** Get collection / table from the users collection ****/
 		DBCollection coll = getColl("printers");
 		/**** Find and display ****/
@@ -530,7 +530,7 @@ public class DBManager {
 		while (cursor.hasNext()) {
 			BasicDBObject n = (BasicDBObject)cursor.next();
 			if(n.getString("name").equals(name)){
-				return false;
+				return -1;
 			}
 		}
 		
@@ -540,14 +540,20 @@ public class DBManager {
 		document.put("ip", ip);
 		document.put("port", port);
 		document.put("name", name);
-		document.put("id", coll.find().size() + 1);
+		document.put("id", coll.find().size());
 		coll.insert(document);
-		return true;
+		
+		// Create the collection for this new printer's prints
+		getColl("printer" + document.getInt("id"));
+		return document.getInt("id");
 	}
 	
 	public void deletePrinter(int id){
 		/**** Get collection / table from the printers collection ****/
 		DBCollection coll = getColl("printers");
+		// Delete the no longer necessary printer prints collection
+		DBCollection deleteColl = getColl("printer" + id);
+		deleteColl.drop();
 		/**** Find and display ****/
 		BasicDBObject searchQuery = new BasicDBObject();
 		searchQuery.put("id", id);

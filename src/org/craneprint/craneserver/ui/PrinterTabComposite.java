@@ -240,5 +240,9 @@ public class PrinterTabComposite extends CustomComponent {
 			}
 		}
 	}
+	
+	public int getPrinterId(){
+		return printerId;
+	}
 
 }

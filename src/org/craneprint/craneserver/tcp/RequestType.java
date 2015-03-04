@@ -48,4 +48,11 @@ public class RequestType {
 	public static final int SET_FAN_SPEED = 46;
 	public static final int CONNECT_TO_PRINTER = 47;
 	public static final int DISCONNECT_FROM_PRINTER = 48;
+	public static final int ADD_PRINTER = 49;
+	public static final int PRINTER_ADDED = 50;
+	public static final int AUTHENTICATION_FAILED = 51;
+	public static final int REQUEST_SUCCEEDED = 52;
+	public static final int UNKNOWN_REQUEST_CODE = 53;
+	public static final int UNSUPPORTED_REQUEST_CODE = 54;
+	public static final int REQUEST_FAILED = 55;
 }

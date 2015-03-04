@@ -20,7 +20,6 @@ public class TCPTransmitter {
 	private final String ip;
 	//private final int printerId;
 	private final int chickPort;
-	private ServerSocket welcomeSocket;
 	private HandShake lastHandShake = null;
 	private long lastHandShakeT = -1;
 	
@@ -34,7 +33,7 @@ public class TCPTransmitter {
 	private HandShake sendHandShake() throws IOException, ParseException {
 		JSONObject obj = new JSONObject();
 	    obj.put("type", RequestType.HAND_SHAKE_CODE);
-	    // TODO: Dynamically retreive printer password from config
+	    // TODO: Dynamically retreive printer password from DB
 	    obj.put("password", "password");
 	    String resp = sendCommand(obj.toJSONString());
 	    return new HandShake(resp);

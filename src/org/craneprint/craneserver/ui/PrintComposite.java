@@ -77,7 +77,8 @@ public class PrintComposite extends CustomComponent implements Serializable{
 	public PrintComposite(Craneprint_craneserverUI u) {
 		ui = u;
 		user = ui.getSessionUser();
-		//ui.getDBManager().setPrinterProperty(1, "id", 0);
+		//ui.getDBManager().deletePrinter(1);
+		//ui.getDBManager().addPrinter("Virtual Printer 2", "password", "172.16.42.13", 6880);
 		
 		folder = new File(System.getProperty("user.home") + File.separator + "CranePrint Uploads" + File.separator + user.getUsername());
 		
@@ -293,8 +294,9 @@ public class PrintComposite extends CustomComponent implements Serializable{
 			}
 		}
 		toPrint.setNotes(notes);
+		PrinterTabComposite ptc = (PrinterTabComposite)printerAccordion.getSelectedTab();
 		for(int i = 0; i < copies; i++)
-			printersManager.addFile(printerAccordion.getTabIndex(), toPrint);
+			printersManager.addFile(ptc.getPrinterId(), toPrint);
 		new Notification("Success", copies +" Copies of Your File Were Added to the Print Queue", Notification.Type.TRAY_NOTIFICATION).show(Page.getCurrent());
 	}
 	

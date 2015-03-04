@@ -23,19 +23,22 @@ public class TCPListenerThread implements Runnable {
 	private final int cranePort;
 	private ServerSocket welcomeSocket;
 	private ServletContext context;
+	private String success;
 	private volatile boolean stop = false;
 	
 	public TCPListenerThread(ServletContext sc, int crp){
 		// TODO: Actually set these values
 		context = sc;
 		cranePort = crp;
+		JSONObject s = new JSONObject();
+		s.put("type", RequestType.REQUEST_SUCCEEDED);
+		success = s.toJSONString();
 		System.out.println("CRANEPORT: " + crp);
 	}
 
 	@Override
 	public void run() {
 		String receivedText;
-		System.out.println("TCPThread Started");
 		try {
 		welcomeSocket = new ServerSocket(cranePort);
 			while(!stop){
@@ -49,11 +52,27 @@ public class TCPListenerThread implements Runnable {
 					int type = getType(jo);
 					if(type == RequestType.JOB_COMPLETE){
 						this.getQueueManager().printComplete((int)(long)jo.get("printerId"));
-					}
-					if(type == RequestType.GET_NEW_JOB){
+						outToAgent.writeBytes(success + "\n");
+					} else if(type == RequestType.GET_NEW_JOB){
 						this.getQueueManager().sendNextInQueue((int)(long)jo.get("printerId"));
+						outToAgent.writeBytes(success + "\n");
+					} else if(type == RequestType.ADD_PRINTER){
+						int i = this.getDBManager().addPrinter((String)jo.get("name"), (String)jo.get("password"), (String)jo.get("ip"), (int)jo.get("port"));
+						if(i != -1){
+							JSONObject j = new JSONObject();
+							j.put("type", RequestType.PRINTER_ADDED);
+							j.put("id", i);
+							outToAgent.writeBytes(j.toJSONString() + "\n");
+						} else {
+							JSONObject j = new JSONObject();
+							j.put("type", RequestType.REQUEST_FAILED);
+							outToAgent.writeBytes(j.toJSONString() + "\n");
+						}
+					} else {
+						JSONObject j = new JSONObject();
+						j.put("type", RequestType.UNKNOWN_REQUEST_CODE);
+						outToAgent.writeBytes(j.toJSONString() + "\n");
 					}
-					outToAgent.writeBytes("{\"resp\":\"success\"}\n");
 				}
 			}
 		} catch(IOException e){
@@ -68,7 +87,6 @@ public class TCPListenerThread implements Runnable {
 			stop = true;
 			Thread.sleep(1000);
 			welcomeSocket.close();
-			System.out.println("TCPThread Stopped");
 		} catch(IOException | InterruptedException e){
 			e.printStackTrace();
 		}
@@ -87,5 +105,9 @@ public class TCPListenerThread implements Runnable {
 	
 	private QueueManager getQueueManager(){
 		return (QueueManager)context.getAttribute("org.craneprint.craneserver.queue.queueManager");
+	}
+	
+	private DBManager getDBManager(){
+		return (DBManager)context.getAttribute("org.craneprint.craneserver.queue.dbManager");
 	}
 }
