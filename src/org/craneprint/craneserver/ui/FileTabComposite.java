@@ -91,6 +91,7 @@ public class FileTabComposite extends CustomComponent {
 		// notesArea
 		notesArea = new TextArea();
 		notesArea.setImmediate(false);
+		notesArea.setValue("Put in Some Notes About this Print. These Notes Will be Sent to the Printer.");
 		notesArea.setWidth("100.0%");
 		notesArea.setHeight("125px");
 		// copiesLayout
@@ -150,7 +151,8 @@ public class FileTabComposite extends CustomComponent {
 		  }
 		);
 		mainLayout.addComponent(deleteButton);
-		notesArea.setValue(notes);
+		if(notes.length() >= 1)
+			notesArea.setValue(notes);
 		
 		return mainLayout;
 	}

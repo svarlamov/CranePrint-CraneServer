@@ -77,7 +77,9 @@ public class PrintComposite extends CustomComponent implements Serializable{
 	public PrintComposite(Craneprint_craneserverUI u) {
 		ui = u;
 		user = ui.getSessionUser();
+		//ui.getDBManager().deletePrinter(0);
 		//ui.getDBManager().deletePrinter(1);
+		//ui.getDBManager().addPrinter("Virtual Printer", "password", "172.16.42.13", 6880);
 		//ui.getDBManager().addPrinter("Virtual Printer 2", "password", "172.16.42.13", 6880);
 		
 		folder = new File(System.getProperty("user.home") + File.separator + "CranePrint Uploads" + File.separator + user.getUsername());

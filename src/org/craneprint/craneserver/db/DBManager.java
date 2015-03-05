@@ -529,7 +529,7 @@ public class DBManager {
 		DBCursor cursor = coll.find(searchQuery);
 		while (cursor.hasNext()) {
 			BasicDBObject n = (BasicDBObject)cursor.next();
-			if(n.getString("name").equals(name)){
+			if(n.getString("name").equals(name) && !n.getBoolean("deleted")){
 				return -1;
 			}
 		}
@@ -539,12 +539,14 @@ public class DBManager {
 		document.put("password", password);
 		document.put("ip", ip);
 		document.put("port", port);
+		document.put("deleted", false);
+		document.put("activated", true);
 		document.put("name", name);
 		document.put("id", coll.find().size());
 		coll.insert(document);
 		
 		// Create the collection for this new printer's prints
-		getColl("printer" + document.getInt("id"));
+		DBCollection col = getColl("printer" + document.getInt("id"));
 		return document.getInt("id");
 	}
 	
@@ -633,6 +635,24 @@ public class DBManager {
 			printers.add((BasicDBObject)cursor.next());
 		}
 		return printers;
+	}
+
+	public boolean isPrinterActive(int id) {
+		/**** Get collection / table from the printers collection ****/
+		DBCollection coll = getColl("printers");
+		/**** Find and display ****/
+		BasicDBObject searchQuery = new BasicDBObject();
+		searchQuery.put("id", id);
+		
+		DBCursor cursor = coll.find(searchQuery);
+		while (cursor.hasNext()) {
+			BasicDBObject n = (BasicDBObject)cursor.next();
+			boolean b = false;
+			if(n.getBoolean("activated"))
+				b = true;
+			return b;
+		}
+		return false;
 	}
 	
 }

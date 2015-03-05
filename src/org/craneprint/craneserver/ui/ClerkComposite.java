@@ -40,8 +40,9 @@ public class ClerkComposite extends CustomComponent {
 	
 	Craneprint_craneserverUI ui = null;
 	private PrintersManager printersManager;
-	private Button closeButton;
+	private Button saveButton;
 	private ArrayList<TabSheet> printerSheets = new ArrayList<TabSheet>();
+	private ArrayList<PrinterSettingsTab> printerSettingsTabs = new ArrayList<PrinterSettingsTab>();
 	
 	/**
 	 * The constructor should first build the main layout, set the
@@ -107,7 +108,9 @@ public class ClerkComposite extends CustomComponent {
 		for(int i = 0; i < ui.getDBManager().getAllPrinters().size(); i++){
 			TabSheet ts = new TabSheet();
 			ts.addTab(new PrintsForPrinterTab(i, ui), "Prints");
-			ts.addTab(new PrinterSettingsTab(i, ui), "Settings");
+			PrinterSettingsTab pst = new PrinterSettingsTab(i, ui);
+			printerSettingsTabs.add(pst);
+			ts.addTab(pst, "Settings");
 			printerSheets.add(ts);
 		}
 		int i = 0;
@@ -153,16 +156,16 @@ public class ClerkComposite extends CustomComponent {
 		});
 		leftVertical.addComponent(printViewButton);
 		
-		closeButton = new Button("Save Configuration");
-		closeButton.setImmediate(false);
-		closeButton.setWidth("100%");
-		closeButton.setHeight("-1px");
-		closeButton.addClickListener(new ClickListener() {
+		saveButton = new Button("Save Configuration");
+		saveButton.setImmediate(false);
+		saveButton.setWidth("100%");
+		saveButton.setHeight("-1px");
+		saveButton.addClickListener(new ClickListener() {
 			public void buttonClick(ClickEvent event) {
-		        // TODO: Save Configuration etc.
+		        saveConfig();
 		    }
 		});
-		leftVertical.addComponent(closeButton);
+		leftVertical.addComponent(saveButton);
 		
 		// accordion_3
 		printerAccordion = new Accordion();
@@ -178,6 +181,13 @@ public class ClerkComposite extends CustomComponent {
 		leftVertical.addComponent(printerPanel);
 		
 		return leftVertical;
+	}
+	
+	private boolean saveConfig(){
+		for(PrinterSettingsTab pst : printerSettingsTabs){
+			pst.saveConfig();
+		}
+		return true;
 	}
 	
 	public HandShake doHandShake() throws IOException, ParseException{
