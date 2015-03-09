@@ -366,6 +366,7 @@ public class DBManager {
 		t.addContainerProperty("Time Printed", String.class, null);
 
 		/**** Get collection / table from the printer's collection ****/
+		int row = 0;
 		Set<String> colls = db.getCollectionNames();
 		for (String s : colls) {
 			if(s.startsWith("printer") && !s.equals("printers")){
@@ -374,7 +375,6 @@ public class DBManager {
 				BasicDBObject searchQuery = new BasicDBObject();
 				searchQuery.put("user", user);
 				DBCursor cursor = coll.find(searchQuery);
-				int row = 0;
 				while (cursor.hasNext()) {
 					BasicDBObject n = (BasicDBObject) cursor.next();
 					t.addItem(this.makePrintRow(n, new Integer(s.replace("printer", "")), mpt), ++row);

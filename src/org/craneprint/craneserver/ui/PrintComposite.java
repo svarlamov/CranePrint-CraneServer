@@ -97,7 +97,7 @@ public class PrintComposite extends CustomComponent implements Serializable{
 		
 		buildMainLayout();
 		setCompositionRoot(mainLayout);
-		
+	
 		printersManager = ui.getPrintersManager();
 		for(int i = 0; i < printersManager.getSize(); i++){
 			PrinterTabComposite ptb = new PrinterTabComposite(printersManager.getPrinter(i).getId(), ui);
