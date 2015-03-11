@@ -84,7 +84,7 @@ public class PrintComposite extends CustomComponent implements Serializable{
 		
 		folder = new File(System.getProperty("user.home") + File.separator + "CranePrint Uploads" + File.separator + user.getUsername());
 		
-		FolderLoad fl = new FolderLoad(folder.getPath());
+		FolderLoad fl = new FolderLoad(ui, folder.getPath());
 		try {
 			fileHashMap = fl.loadAllFiles();
 		} catch (IOException e) {
@@ -150,8 +150,8 @@ public class PrintComposite extends CustomComponent implements Serializable{
 		slicingTab = new SlicingTab(ui);
 		helpTab = new HelpTab(ui);
 		myPrintsTab = new MyPrintsTab(ui);
-		detailsTabSheet.addTab(slicingTab, "Slicing");
 		detailsTabSheet.addTab(myPrintsTab, "My Prints");
+		detailsTabSheet.addTab(slicingTab, "Slicing");
 		detailsTabSheet.addTab(helpTab, "Help");
 		
 		return printingHorizSplitPanel;

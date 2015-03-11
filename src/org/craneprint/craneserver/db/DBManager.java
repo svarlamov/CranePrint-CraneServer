@@ -222,7 +222,7 @@ public class DBManager {
 		// Create GCodeFile only if there is a file to be printed
 		GCodeFile toPrint = null;
 		if(oldestOne != null) {
-			toPrint = new GCodeFile(new File(oldestOne.getString("path")), oldestOne.getString("name"), oldestOne.getString("notes"), oldestOne.getString("user"), oldestOne.getLong("id"));
+			toPrint = new GCodeFile(this, new File(oldestOne.getString("path")), oldestOne.getString("name"), oldestOne.getString("notes"), oldestOne.getString("user"), oldestOne.getLong("id"));
 		
 			/**** Update ****/
 			// search document for the oldest file still waiting, and update it with new values
@@ -504,8 +504,8 @@ public class DBManager {
 		return cursor.size();
 	}
 	
-	public ArrayList<Object[]> getPrintQueue(int printerId){
-		ArrayList<Object[]> files = new ArrayList<Object[]>();
+	public ArrayList<Integer> getPrintQueue(int printerId){
+		ArrayList<Integer> ids = new ArrayList<Integer>();
 		/**** Get collection / table from the users collection ****/
 		DBCollection coll = getColl("printer" + printerId);
 		
@@ -514,9 +514,12 @@ public class DBManager {
 		
 		DBCursor cursor = coll.find(searchQuery);
 		while(cursor.hasNext()){
-			// Make these into some kind of usable format and then use them in our code...
+			BasicDBObject n = (BasicDBObject)cursor.next();
+			if(n.getInt("print_status") == PrintStatus.IN_QUE || n.getInt("print_status") == PrintStatus.PRINTING){
+				ids.add(n.getInt("id"));
+			}
 		}
-		return files;
+		return ids;
 	}
 	
 	public int addPrinter(String name, String password, String ip, int port){
@@ -653,6 +656,40 @@ public class DBManager {
 			return b;
 		}
 		return false;
+	}
+	
+	public boolean isFileNeeded(GCodeFile gcf){
+		DBCollection coll = getColl("printers");
+		DBCursor cursor = coll.find();
+		while (cursor.hasNext()){
+			BasicDBObject n = (BasicDBObject)cursor.next();
+			ArrayList<String> ps = this.getPrintQueueFilePaths(n.getInt("id"));
+			for(String s : ps){
+				if(s.equals(gcf.getFile().getPath())){
+					System.out.println("File is Needed, with path of " + gcf.getFile().getPath());
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public ArrayList<String> getPrintQueueFilePaths(int printerId){
+		ArrayList<String> paths = new ArrayList<String>();
+		/**** Get collection / table from the users collection ****/
+		DBCollection coll = getColl("printer" + printerId);
+		
+		/**** Find and display ****/
+		DBObject searchQuery = buildStatusQuery();
+		
+		DBCursor cursor = coll.find(searchQuery);
+		while(cursor.hasNext()){
+			BasicDBObject n = (BasicDBObject)cursor.next();
+			if(n.getInt("print_status") == PrintStatus.IN_QUE || n.getInt("print_status") == PrintStatus.PRINTING){
+				paths.add(n.getString("path"));
+			}
+		}
+		return paths;
 	}
 	
 }

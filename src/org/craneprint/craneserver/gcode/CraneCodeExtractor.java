@@ -1,29 +1,28 @@
 package org.craneprint.craneserver.gcode;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Iterator;
 
-import org.json.simple.JSONArray;
+import org.craneprint.craneserver.ui.Craneprint_craneserverUI;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class CraneCodeExtractor {
 	private File file;
+	private Craneprint_craneserverUI ui;
 	
-	public CraneCodeExtractor(File f) {
+	public CraneCodeExtractor(Craneprint_craneserverUI u, File f) {
+		ui = u;
 		file = f;
 	}
 	
 	public GCodeFile getMyGCodeFile() throws IOException {
 		GCodeFile gcf;
 		JSONObject j = readMetaFile();
-		gcf = new GCodeFile(file, (String)j.get("name"), (String)j.get("notes"), (String)j.get("user"));
+		gcf = new GCodeFile(ui.getDBManager(), file, (String)j.get("name"), (String)j.get("notes"), (String)j.get("user"));
 		return gcf;
 	}
 	

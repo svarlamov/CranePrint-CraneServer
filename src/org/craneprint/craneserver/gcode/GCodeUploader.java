@@ -70,7 +70,7 @@ public class GCodeUploader implements Receiver, SucceededListener, FailedListene
         // Create a "GCodeFile" and add it to the accordion in the parent class
     	event.getComponent();
     	ui = (Craneprint_craneserverUI)UI.getCurrent();
-    	GCodeFile gcf = new GCodeFile(file, fileName, "", ui.getSessionUser().getUsername());
+    	GCodeFile gcf = new GCodeFile(ui.getDBManager(), file, fileName, "", ui.getSessionUser().getUsername());
     	CraneCodePacker c = new CraneCodePacker(gcf);
     	try {
 			c.pack();

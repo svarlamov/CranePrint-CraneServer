@@ -2,16 +2,22 @@ package org.craneprint.craneserver.gcode;
 
 import java.io.File;
 
+import javax.servlet.ServletContext;
+
+import org.craneprint.craneserver.db.DBManager;
+
 public class GCodeFile {
 	// An object to represent uploaded gcode files
 	private File file = null;
 	private String name = "";
 	private String user = "";
 	private String notes = "";
+	private DBManager db;
 	private long printId;
 	private boolean deleted = false;
 	
-	public GCodeFile(File f, String n, String ns, String u, long id){
+	public GCodeFile(DBManager dbManager, File f, String n, String ns, String u, long id){
+		db = dbManager;
 		file = f;
 		name = n;
 		user = u;
@@ -19,7 +25,8 @@ public class GCodeFile {
 		notes = ns;
 	}
 	
-	public GCodeFile(File f, String n, String ns, String u){
+	public GCodeFile(DBManager dbManager, File f, String n, String ns, String u){
+		db = dbManager;
 		file = f;
 		name = n;
 		notes = ns;
@@ -30,13 +37,16 @@ public class GCodeFile {
 		return printId;
 	}
 	public boolean deleteFile(){
-		boolean success = true;
-		success = file.delete();
-		File meta = new File(file.getPath() + ".meta");
-		if(meta.exists())
-			success = meta.delete();
-		deleted = success;
-		return success;
+		if(!db.isFileNeeded(this)){
+			deleted = file.delete();
+			File meta = new File(file.getPath() + ".meta");
+			if(meta.exists())
+				deleted = meta.delete();
+			return deleted;
+		} else {
+			deleted = false;
+			return false;
+		}
 	}
 	
 	public void setNotes(String ns){
@@ -66,5 +76,9 @@ public class GCodeFile {
 	public static long calculateFilamentUsage(GCodeFile f){
 		//TODO: Actually calculate instead of simply returning a test value
 		return 900;
+	}
+
+	public void setId(long id) {
+		printId = id;		
 	}
 }
